@@ -1,0 +1,5 @@
+練習問題3.4
+　もし，あるとしたら，VehicleとPassengerVehicleのどのメソッドをfinalにするのが適切ですか
+
+A．PassengerVehicleのsetSeatNumber
+   車の座席数は変わらないから

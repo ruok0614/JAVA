@@ -1,35 +1,23 @@
-package jpl.ch03.ex01;
+package jpl.ch03.ex09;
 
-/**
- * 練習問題 3.1
- *  車が持っている座席数と現在座っている人数を返す機能を追加しなさい．
- *  また，新たにmain分を追加定義してPassengerVehicleを数個生成して表示するようにしなさい
- *
- **/
-
-public class PassengerVehicle {
+public class Vehicle implements Cloneable{
     private String name;    //名前
     private double velocity; //　速度
     private double angle; //方向
     private String owner; // 所有者
     private static long VehicleCode = 0;    //識別番号
-    private int passengerCount; // 乗客人数
-    private int seatNumber; // 座席数
 
     {
         VehicleCode ++;
     }
 
-    private long VehicleCodeLocal = VehicleCode;    //識別番号（個体）
+    private long VehicleCodeLocal = VehicleCode;    //識別番号
 
-    PassengerVehicle(String name, double velocity, double angle, String owner,int passengerCount,
-                     int seatNumber){
+    Vehicle(String name, double velocity, double angle, String owner){
         this.name = name;
         this.velocity = velocity;
         this.angle = angle;
         this.owner = owner;
-        this.passengerCount = passengerCount;
-        this.seatNumber = seatNumber;
     }
 
     void SetName(String name){
@@ -57,14 +45,15 @@ public class PassengerVehicle {
     }
 
     public String toString(){
-//        String desc = VehicleCodeLocal + " " + name + " " + velocity + "km/h "
-//                + angle + " " + owner;
-        String desc = String.format(" name : %s\n owner : %s\n" +
-                " velocity : %03.1f\n angle : %02.1f\n passengerCount : %d\n" +
-                " seatNumber : %d\n VehicleCode : %d",
-                name,owner,velocity,angle,passengerCount,seatNumber,VehicleCode);
+        String desc = VehicleCodeLocal + " " + name + " " + velocity + "km/h "
+                + angle + " " + owner;
         return desc;
     }
+
+    void turn(double angle){
+        this.angle += angle;
+    }
+
 
     void ShowField(){
         System.out.println(this.name);
@@ -79,9 +68,22 @@ public class PassengerVehicle {
         return VehicleCode;
     }
 
+    @Override
+    public Vehicle clone(){
+        try{
+            return (Vehicle) super.clone();
+
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static void main(String args[]){
-        PassengerVehicle twinBus = new PassengerVehicle("twinBus",60,0,"Taro",40,120);
-        System.out.println(twinBus.toString());
+        Vehicle car = new Vehicle("Aqua" ,50,0,"Taro");
+        Vehicle car2 = car.clone();
+        car2.ShowField();
+
     }
 
 

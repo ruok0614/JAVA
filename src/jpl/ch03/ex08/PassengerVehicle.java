@@ -1,4 +1,4 @@
-package jpl.ch03.ex01;
+package jpl.ch03.ex08;
 
 /**
  * 練習問題 3.1
@@ -22,7 +22,7 @@ public class PassengerVehicle {
 
     private long VehicleCodeLocal = VehicleCode;    //識別番号（個体）
 
-    PassengerVehicle(String name, double velocity, double angle, String owner,int passengerCount,
+    PassengerVehicle(String name, double velocity, double angle, String owner, int passengerCount,
                      int seatNumber){
         this.name = name;
         this.velocity = velocity;
