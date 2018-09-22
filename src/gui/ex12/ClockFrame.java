@@ -18,7 +18,8 @@ public class ClockFrame extends Frame implements ActionListener{
     private Color fontColor;
     private Color backColor;
     private String fontStr;
-    private int fontSize;
+    private int fontSize; //サイズはpoint 1pt = 1.33px
+
 
 
     ClockFrame(){
@@ -33,6 +34,8 @@ public class ClockFrame extends Frame implements ActionListener{
         colorList.add(Color.yellow);
 
 
+
+
         setFontColor(Color.black);
         setFontSize(50);
         setBackColor(Color.white);
@@ -42,6 +45,15 @@ public class ClockFrame extends Frame implements ActionListener{
         setMenuBar(clockMenu.menuBar);
 
         addWindowListener(new Ada());
+
+        setLayout(null);
+
+        Button b1 = new Button("OK");
+        b1.addActionListener(this);
+        b1.setBounds(120, 120, 30, 20);
+        add(b1);
+
+
         clock.th.start();
 
     }
@@ -87,7 +99,7 @@ public class ClockFrame extends Frame implements ActionListener{
         Font font = new Font(fontStr,Font.PLAIN,fontSize);
         strg.setColor(fontColor);
         strg.setFont(font);
-        strg.drawString(String.format("%02d:%02d:%02d",clock.h,clock.m,clock.s),50,100);
+        strg.drawString(String.format("%02d:%02d:%02d",clock.h,clock.m,clock.s),50,120);
         g.drawImage(buffer,0,0,this);
 
 
