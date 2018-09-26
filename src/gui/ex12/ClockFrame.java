@@ -21,12 +21,14 @@ public class ClockFrame extends Frame implements ActionListener{
     private int fontSize; //サイズはpoint 1pt = 1.33px
     private int frameWidth;
     private int frameHeight;
+    int count;
 
 
 
     ClockFrame(){
         frameWidth = 300;
         frameHeight = 160;
+        count = 0;
 
         clock = new Clock();
         setTitle("Clock");
@@ -38,9 +40,8 @@ public class ClockFrame extends Frame implements ActionListener{
         colorList.add(Color.white);
         colorList.add(Color.red);
         colorList.add(Color.yellow);
-
-
-
+        colorList.add(Color.orange);
+        colorList.add(Color.pink);
 
         setFontColor(Color.black);
         setFontSize(50);
@@ -54,9 +55,9 @@ public class ClockFrame extends Frame implements ActionListener{
 
         setLayout(null);
 
-        Button b1 = new Button("OK");
+        Button b1 = new Button("変更");
         b1.addActionListener(this);
-        b1.setBounds(0, 50, 30, 20);
+        b1.setBounds(15, 50, 30, 20);
         add(b1);
 
 
@@ -83,11 +84,18 @@ public class ClockFrame extends Frame implements ActionListener{
     public int getFontSize(){
         return fontSize;
     }
+
     public void actionPerformed(ActionEvent e) {
+        colorShuffle();
+        count++;
+    }
+
+    public void colorShuffle(){
         Collections.shuffle(colorList);
         setBackColor(colorList.get(0));
         setFontColor(colorList.get(1));
     }
+
     @Override
     public void paint(Graphics g)
     {   //バッファのグラフィックコンテキストを取得する
@@ -121,6 +129,9 @@ public class ClockFrame extends Frame implements ActionListener{
     void clockRun(){
         boolean a = true;
         while (a==true){
+            if((3 < count) && (count< 10)){
+                colorShuffle();
+            }
             repaint();
             try{
                 clock.th.sleep(100);  //スリープ１秒
