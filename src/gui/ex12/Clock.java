@@ -3,9 +3,9 @@ package gui.ex12;
 import java.util.Calendar;
 
 class Clock implements Runnable{
-    int h;           //時を入れる変数を宣言
-    int m;           //分を入れる変数を宣言
-    int s;           //秒を入れる変数を宣言
+    static int h;           //時を入れる変数を宣言
+    static int m;           //分を入れる変数を宣言
+    static int s;           //秒を入れる変数を宣言
 
     boolean a = true;
 
