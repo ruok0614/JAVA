@@ -1,25 +1,28 @@
 package gui.ex12;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 class Clock implements Runnable{
-    static int h;           //時を入れる変数を宣言
-    static int m;           //分を入れる変数を宣言
-    static int s;           //秒を入れる変数を宣言
+    private int h;           //時を入れる変数を宣言
+    private int m;           //分を入れる変数を宣言
+    private int s;           //秒を入れる変数を宣言
 
-    boolean a = true;
+
 
     //インスタンス化
-    Thread th;
+    private Thread th;
     Clock(){
         // Threadを呼び出し、Runnnableで
         th = new Thread(this);
     }
 
-
+    public void start(){
+        th.start();
+    }
 
     public void run(){
-        while(a==true){
+        while(true){
             // getInstanceはstaticメソッド。なのでクラス名で指定
             h = Calendar.getInstance().get(Calendar.HOUR_OF_DAY); //時を代入
             m = Calendar.getInstance().get(Calendar.MINUTE);      //分を代入
@@ -30,5 +33,18 @@ class Clock implements Runnable{
             }
         }
     }
+
+    public int getH() {
+        return h;
+    }
+
+    public int getM() {
+        return m;
+    }
+
+    public int getS() {
+        return s;
+    }
+
 
 }

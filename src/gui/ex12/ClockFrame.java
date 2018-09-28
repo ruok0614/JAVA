@@ -61,7 +61,7 @@ public class ClockFrame extends Frame implements ActionListener{
         add(b1);
 
 
-        clock.th.start();
+        clock.start();
 
     }
 
@@ -113,7 +113,7 @@ public class ClockFrame extends Frame implements ActionListener{
         Font font = new Font(fontStr,Font.PLAIN,fontSize);
         strg.setColor(fontColor);
         strg.setFont(font);
-        strg.drawString(String.format("%02d:%02d:%02d",clock.h,clock.m,clock.s),(int)(0.16*d.width),(int)(0.75*d.height));
+        strg.drawString(String.format("%02d:%02d:%02d",clock.getH(),clock.getM(),clock.getS()),(int)(0.16*d.width),(int)(0.75*d.height));
         g.drawImage(buffer,0,0,this);
 
 
@@ -127,14 +127,13 @@ public class ClockFrame extends Frame implements ActionListener{
     }
 
     void clockRun(){
-        boolean a = true;
-        while (a==true){
+        while (true){
             if((3 < count) && (count< 10)){
                 colorShuffle();
             }
             repaint();
             try{
-                clock.th.sleep(100);  //スリープ１秒
+                Thread.sleep(100);  //スリープ１秒
             }catch(InterruptedException e){
 
             }
