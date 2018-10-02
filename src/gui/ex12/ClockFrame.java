@@ -3,12 +3,12 @@ package gui.ex12;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Calendar;
 import java.util.Collections;
 
 
 public class ClockFrame extends Frame implements ActionListener{
 
-    Clock clock;
     Thread th;
     Image buffer;
     Graphics bufferg;
@@ -30,7 +30,6 @@ public class ClockFrame extends Frame implements ActionListener{
         frameHeight = 160;
         count = 0;
 
-        clock = new Clock();
         setTitle("Clock");
 
         setSize(frameWidth, frameHeight);
@@ -60,8 +59,6 @@ public class ClockFrame extends Frame implements ActionListener{
         b1.setBounds(15, 50, 30, 20);
         add(b1);
 
-
-        clock.start();
 
     }
 
@@ -113,7 +110,8 @@ public class ClockFrame extends Frame implements ActionListener{
         Font font = new Font(fontStr,Font.PLAIN,fontSize);
         strg.setColor(fontColor);
         strg.setFont(font);
-        strg.drawString(String.format("%02d:%02d:%02d",clock.getH(),clock.getM(),clock.getS()),(int)(0.16*d.width),(int)(0.75*d.height));
+        Calendar now = Calendar.getInstance();
+        strg.drawString(String.format("%02d:%02d:%02d",now.get(Calendar.HOUR_OF_DAY),now.get(Calendar.MINUTE),now.get(Calendar.SECOND)),(int)(0.16*d.width),(int)(0.75*d.height));
         g.drawImage(buffer,0,0,this);
 
 
