@@ -63,7 +63,7 @@ public class ClockMenu implements ActionListener {
             Button b1 = new Button("OK");
             b1.addActionListener(this);
             add(b1);
-            setTitle("MyDialog");
+            setTitle("ListColor");
             setSize(80, 100);
         }
         public void actionPerformed(ActionEvent e) {
@@ -94,7 +94,7 @@ public class ClockMenu implements ActionListener {
             Button b1 = new Button("OK");
             b1.addActionListener(this);
             add(b1);
-            setTitle("MyDialogListFont");
+            setTitle("ListFont");
             setSize(80, 100);
         }
         public void actionPerformed(ActionEvent e) {
@@ -118,11 +118,13 @@ public class ClockMenu implements ActionListener {
             Button b1 = new Button("OK");
             b1.addActionListener(this);
             add(b1);
-            setTitle("MyDialogListFont");
+            setTitle("FontSize");
             setSize(80, 100);
         }
         public void actionPerformed(ActionEvent e) {
-            clockFrame.setFontSize(Integer.parseInt(t1.getText()));
+            int size = Integer.parseInt(t1.getText());
+            clockFrame.setFontSize(size);
+            clockFrame.setSize((int)(size*6),(int)(size*3.2));
             hide();
         }
     }
@@ -141,7 +143,7 @@ public class ClockMenu implements ActionListener {
             Button b1 = new Button("OK");
             b1.addActionListener(this);
             add(b1);
-            setTitle("MyDialog");
+            setTitle("ListBackColor");
             setSize(80, 100);
         }
         public void actionPerformed(ActionEvent e) {

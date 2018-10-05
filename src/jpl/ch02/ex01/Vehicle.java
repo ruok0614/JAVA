@@ -9,5 +9,4 @@ public class Vehicle {
     double velocity; // 速度
     double angle; // 角度
     String owner; // 所有者
-
 }

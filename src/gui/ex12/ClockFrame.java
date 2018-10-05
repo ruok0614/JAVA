@@ -3,12 +3,12 @@ package gui.ex12;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Calendar;
 import java.util.Collections;
 
 
 public class ClockFrame extends Frame implements ActionListener{
 
-    Clock clock;
     Thread th;
     Image buffer;
     Graphics bufferg;
@@ -18,20 +18,29 @@ public class ClockFrame extends Frame implements ActionListener{
     private Color fontColor;
     private Color backColor;
     private String fontStr;
-    private int fontSize;
+    private int fontSize; //サイズはpoint 1pt = 1.33px
+    private int frameWidth;
+    private int frameHeight;
+    int count;
+
 
 
     ClockFrame(){
-        clock = new Clock();
+        frameWidth = 300;
+        frameHeight = 160;
+        count = 0;
+
         setTitle("Clock");
-        setSize(300, 160);
+
+        setSize(frameWidth, frameHeight);
 
         colorList.add(Color.black);
         colorList.add(Color.blue);
         colorList.add(Color.white);
         colorList.add(Color.red);
         colorList.add(Color.yellow);
-
+        colorList.add(Color.orange);
+        colorList.add(Color.pink);
 
         setFontColor(Color.black);
         setFontSize(50);
@@ -42,7 +51,14 @@ public class ClockFrame extends Frame implements ActionListener{
         setMenuBar(clockMenu.menuBar);
 
         addWindowListener(new Ada());
-        clock.th.start();
+
+        setLayout(null);
+
+        Button b1 = new Button("変更");
+        b1.addActionListener(this);
+        b1.setBounds(15, 50, 30, 20);
+        add(b1);
+
 
     }
 
@@ -65,11 +81,18 @@ public class ClockFrame extends Frame implements ActionListener{
     public int getFontSize(){
         return fontSize;
     }
+
     public void actionPerformed(ActionEvent e) {
+        colorShuffle();
+        count++;
+    }
+
+    public void colorShuffle(){
         Collections.shuffle(colorList);
         setBackColor(colorList.get(0));
         setFontColor(colorList.get(1));
     }
+
     @Override
     public void paint(Graphics g)
     {   //バッファのグラフィックコンテキストを取得する
@@ -87,7 +110,8 @@ public class ClockFrame extends Frame implements ActionListener{
         Font font = new Font(fontStr,Font.PLAIN,fontSize);
         strg.setColor(fontColor);
         strg.setFont(font);
-        strg.drawString(String.format("%02d:%02d:%02d",clock.h,clock.m,clock.s),50,100);
+        Calendar now = Calendar.getInstance();
+        strg.drawString(String.format("%02d:%02d:%02d",now.get(Calendar.HOUR_OF_DAY),now.get(Calendar.MINUTE),now.get(Calendar.SECOND)),(int)(0.16*d.width),(int)(0.75*d.height));
         g.drawImage(buffer,0,0,this);
 
 
@@ -101,11 +125,13 @@ public class ClockFrame extends Frame implements ActionListener{
     }
 
     void clockRun(){
-        boolean a = true;
-        while (a==true){
+        while (true){
+            if((3 < count) && (count< 10)){
+                colorShuffle();
+            }
             repaint();
             try{
-                clock.th.sleep(100);  //スリープ１秒
+                Thread.sleep(100);  //スリープ１秒
             }catch(InterruptedException e){
 
             }
