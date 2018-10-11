@@ -7,7 +7,6 @@ class Clock implements Runnable{
     int m;           //分を入れる変数を宣言
     int s;           //秒を入れる変数を宣言
 
-    boolean a = true;
 
     //インスタンス化
     Thread th;
@@ -19,7 +18,7 @@ class Clock implements Runnable{
 
 
     public void run(){
-        while(a==true){
+        while(true){
             // getInstanceはstaticメソッド。なのでクラス名で指定
             h = Calendar.getInstance().get(Calendar.HOUR_OF_DAY); //時を代入
             m = Calendar.getInstance().get(Calendar.MINUTE);      //分を代入

@@ -10,6 +10,7 @@ public class OhtelloBoard {
     public static final int DIRECTION_NUM = 8;
     public static final int X = 1;
     public static final int Y = 0;
+
     public static final OthelloPiece.OthelloStatus BLACK = OthelloPiece.OthelloStatus.black;
     public static final OthelloPiece.OthelloStatus WHITE = OthelloPiece.OthelloStatus.white;
     static final int[][] allDirection = {
@@ -24,8 +25,15 @@ public class OhtelloBoard {
             };
 
     OthelloPiece[][] OthelloBoard;
+    public int blackNum;
+    public int whiteNum;
+
+    OhtelloBoard(){
+        boardInit();
+    }
 
     void boardInit(){
+
         OthelloBoard = new OthelloPiece[MAX_ROW][MAX_COLUM];
         OthelloBoard[3][3] = new OthelloPiece(3,3,WHITE);
         OthelloBoard[4][4] = new OthelloPiece(4,4,WHITE);
@@ -54,7 +62,7 @@ public class OhtelloBoard {
             int x = piece.getX();
             y += allDirection[i][Y];
             x += allDirection[i][X];
-            if( ( y<0 || y>MAX_ROW ) || ( x<0 || x>MAX_COLUM ) ){
+            if( ( y<0 || y>=MAX_ROW ) || ( x<0 || x>=MAX_COLUM ) ){
                 //System.out.println("ボード範囲外です");
                 continue;
             }
@@ -71,6 +79,10 @@ public class OhtelloBoard {
                 while (true) {
                     y += allDirection[i][Y];
                     x += allDirection[i][X];
+                    if( ( y<0 || y>=MAX_ROW ) || ( x<0 || x>=MAX_COLUM ) ){
+                        //System.out.println("ボード範囲外です");
+                        break;
+                    }
                     // nullである
                     if (OthelloBoard[y][x] == null) {
                         break;
@@ -94,6 +106,7 @@ public class OhtelloBoard {
 
     boolean checkSet(int row,int column,OthelloPiece.OthelloStatus status){
         OthelloPiece tmpPiece = new OthelloPiece(row,column,status);
+        boolean res = false;
         //8方向を捜査
         for(int i = 0; i < DIRECTION_NUM; i++) {
             int y = row;
@@ -114,39 +127,49 @@ public class OhtelloBoard {
                 while (true) {
                     y += allDirection[i][Y];
                     x += allDirection[i][X];
+                    if( ( y<0 || y>=MAX_ROW ) || ( x<0 || x>=MAX_COLUM ) ){
+                        //System.out.println("ボード範囲外です");
+                        break;
+                    }
                     // nullである
                     if (OthelloBoard[y][x] == null) {
-                        return false;
+                        break;
                     }// 自分と同じ色である
                     else if (tmpPiece.equals(OthelloBoard[y][x]) == true) {
-                        return true;
+                        res = true;
+                        break;
                     } //自分と違う色である
                     else if (tmpPiece.equals(OthelloBoard[y][x]) == false) {
                         continue;
                     }else {
-                        return false;
+                        break;
                     }
                 }
 
             }
         }
-        return false;
+        return res;
     }
 
     void show(OthelloPiece.OthelloStatus status){
-        System.out.print("  ０１２３４５６７８\n");
+        blackNum = 0;
+        whiteNum = 0;
+        System.out.print("  ０１２３４５６７\n");
         for(int i = 0; i<MAX_ROW; i ++){
             System.out.print(i + " ");
             for(int j = 0; j<MAX_COLUM; j++){
                 if(OthelloBoard[i][j] == null ) {
                     if (checkSet(i, j, status) == true) {
+
                         System.out.print("＋");
                     } else if (checkSet(i, j, status) == false) {
                         System.out.print("ー");
                     }
                 }else if(OthelloBoard[i][j].getStatus() == BLACK){
+                    blackNum++;
                     System.out.print("●");
                 }else if(OthelloBoard[i][j].getStatus() == WHITE) {
+                    whiteNum++;
                     System.out.print("〇");
                 }
             }
