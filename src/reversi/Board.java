@@ -72,39 +72,40 @@ public class Board {
      */
     public boolean setPiece(int x,int y,Piece piece){
         // 反転の処理もここ：セットししたのに反転しないことはないため
-        boolean flag = false;
-        for(int i = 0; i < DIRECTION_NUM; i++){
-            int varY = y;
-            int varX = x;
-            varY += allDirection[i][Y];
-            varX += allDirection[i][X];
-            if(checkIndexoutOrNone(varX,varY)){
-                continue;
-            }
-
-            while(piece != getPiece(varX,varY)){
-                varY += allDirection[i][Y];
-                varX += allDirection[i][X];
-                if(checkIndexoutOrNone(varX,varY)){
-                    break;
-                }
-                if(piece == getPiece(varX,varY)){
-                    varY -= allDirection[i][Y];
-                    varX -= allDirection[i][X];
-                    do {
-                        board[varY][varX] = piece == Piece.BLACK?Piece.BLACK:Piece.WHITE;
-                        varY -= allDirection[i][Y];
-                        varX -= allDirection[i][X];
-                    }while(varX != x && varY != y);
-                    flag = true;
-                    break;
-                }
-            }
-        }
-        if(flag){
-            board[y][x] = piece == Piece.BLACK?Piece.BLACK:Piece.WHITE;
-        }
-        return flag;
+        return trySetPiece(x,y,piece,true);
+//        boolean flag = false;
+//        for(int i = 0; i < DIRECTION_NUM; i++){
+//            int varY = y;
+//            int varX = x;
+//            varY += allDirection[i][Y];
+//            varX += allDirection[i][X];
+//            if(checkIndexoutOrNone(varX,varY)){
+//                continue;
+//            }
+//
+//            while(piece != getPiece(varX,varY)){
+//                varY += allDirection[i][Y];
+//                varX += allDirection[i][X];
+//                if(checkIndexoutOrNone(varX,varY)){
+//                    break;
+//                }
+//                if(piece == getPiece(varX,varY)){
+//                    varY -= allDirection[i][Y];
+//                    varX -= allDirection[i][X];
+//                    do {
+//                        board[varY][varX] = piece == Piece.BLACK?Piece.BLACK:Piece.WHITE;
+//                        varY -= allDirection[i][Y];
+//                        varX -= allDirection[i][X];
+//                    }while(varX != x && varY != y);
+//                    flag = true;
+//                    break;
+//                }
+//            }
+//        }
+//        if(flag){
+//            board[y][x] = piece == Piece.BLACK?Piece.BLACK:Piece.WHITE;
+//        }
+//        return flag;
     }
     /**
      * ボードの座標(x,y)に駒に駒が置けるかチェックします．
@@ -114,26 +115,27 @@ public class Board {
      * @return 駒が置けるかの真偽
      */
     public boolean check(int x,int y,Piece piece){
-        for(int i = 0; i < DIRECTION_NUM; i++){
-            int varY = y;
-            int varX = x;
-            varY += allDirection[i][Y];
-            varX += allDirection[i][X];
-            if(checkIndexoutOrNone(varX,varY)){
-                continue;
-            }
-            while(piece != getPiece(varX,varY)){
-                varY += allDirection[i][Y];
-                varX += allDirection[i][X];
-                if(checkIndexoutOrNone(varX,varY)){
-                    break;
-                }
-                if(piece == getPiece(varX,varY)){
-                    return true;
-                }
-            }
-        }
-        return false;
+        return trySetPiece(x,y,piece,false);
+//        for(int i = 0; i < DIRECTION_NUM; i++){
+//            int varY = y;
+//            int varX = x;
+//            varY += allDirection[i][Y];
+//            varX += allDirection[i][X];
+//            if(checkIndexoutOrNone(varX,varY)){
+//                continue;
+//            }
+//            while(piece != getPiece(varX,varY)){
+//                varY += allDirection[i][Y];
+//                varX += allDirection[i][X];
+//                if(checkIndexoutOrNone(varX,varY)){
+//                    break;
+//                }
+//                if(piece == getPiece(varX,varY)){
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
     }
 
 
@@ -205,29 +207,37 @@ public class Board {
     private boolean trySetPiece(int x,int y,Piece piece,boolean acutuallySet){
         boolean flag = false;
         for(int i = 0; i < DIRECTION_NUM; i++){
-            y += allDirection[i][Y];
-            x += allDirection[i][X];
-            if(checkIndexoutOrNone(x,y)){
+            int varY = y;
+            int varX = x;
+            varY += allDirection[i][Y];
+            varX += allDirection[i][X];
+            if(checkIndexoutOrNone(varX,varY)){
                 continue;
             }
-            while(piece != getPiece(x,y)){
-                y += allDirection[i][Y];
-                x += allDirection[i][X];
-                if(checkIndexoutOrNone(x,y)){
+
+            while(piece != getPiece(varX,varY)){
+                varY += allDirection[i][Y];
+                varX += allDirection[i][X];
+                if(checkIndexoutOrNone(varX,varY)){
                     break;
                 }
-                if(piece == getPiece(x,y) && acutuallySet){
+                if(piece == getPiece(varX,varY) && acutuallySet){
+                    varY -= allDirection[i][Y];
+                    varX -= allDirection[i][X];
                     do {
-                        y -= allDirection[i][Y];
-                        x -= allDirection[i][X];
-                        board[y][x] = piece == Piece.BLACK ? Piece.WHITE : Piece.BLACK;
-                    } while (piece != getPiece(x, y));
+                        board[varY][varX] = piece == Piece.BLACK?Piece.BLACK:Piece.WHITE;
+                        varY -= allDirection[i][Y];
+                        varX -= allDirection[i][X];
+                    }while(varX != x && varY != y);
                     flag = true;
                     break;
-                }else if(!acutuallySet){
+                }else if(piece == getPiece(varX,varY) && !acutuallySet){
                     return true;
                 }
             }
+        }
+        if(flag && acutuallySet){
+            board[y][x] = piece == Piece.BLACK?Piece.BLACK:Piece.WHITE;
         }
         return flag;
     }
