@@ -140,7 +140,7 @@ public class OhtelloSystem {
     }
 
     public static void main(String args[]){
-        //start();
-        randomGame();
+        start();
+        //randomGame();
     }
 }
