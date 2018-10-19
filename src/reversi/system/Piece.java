@@ -1,4 +1,4 @@
-package reversi;
+package reversi.system;
 
 public enum Piece {
     BLACK,
