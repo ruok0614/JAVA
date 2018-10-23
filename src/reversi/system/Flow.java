@@ -29,6 +29,7 @@ public class Flow {
                 Point point = inputHandler.getPoint(board,currentColor);
                 hasSet = board.setPiece(point.getX(), point.getY(), currentColor);
                 System.out.println(hasSet);
+
             }while (!hasSet);
             currentColor = currentColor == Piece.BLACK?Piece.WHITE:Piece.BLACK;
         }
