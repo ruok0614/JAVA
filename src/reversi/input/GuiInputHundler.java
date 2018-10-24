@@ -31,12 +31,15 @@ public class GuiInputHundler implements PieceInputHandler,Runnable {
 
     @Override
     public Point getPoint(ReadOnlyBoard board, Piece piece) {
-
-        while (true){
-            if (Masu.getClick()){
-
-                break;
+        Piece[][] tmpPiece = new Piece[board.getHeight()][board.getWidth()];
+        while (Masu.getClick()){
+            for(int y = 0; y < board.getHeight();y++){
+                for(int x = 0; x < board.getWidth();x++){
+                    tmpPiece[y][x] = board.getPiece(x,y);
+                }
             }
+            ReversiFrame.setBoard(tmpPiece);
+            break;
         }
         return Masu.getActivePoint();
     }

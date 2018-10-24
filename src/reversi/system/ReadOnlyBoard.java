@@ -23,6 +23,7 @@ public interface ReadOnlyBoard {
     Piece getPiece(int x,int y);
 
 
+
     /**
      * ボードの座標(x,y)に駒に駒が置けるかチェックします．
      * @param x　チェックする駒のx座標

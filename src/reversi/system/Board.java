@@ -27,6 +27,7 @@ public class Board implements ReadOnlyBoard{
     private final int height;
 
 
+
     public Board(int width,int height){
         this.width = width;
         this.height = height;
@@ -47,8 +48,11 @@ public class Board implements ReadOnlyBoard{
         return board[y][x];
     }
 
+    public Piece[][] getBoard() {
+        return board;
+    }
 
-    public boolean check(int x,int y,Piece piece){
+    public boolean check(int x, int y, Piece piece){
         return trySetPiece(x,y,piece,false);
     }
 
