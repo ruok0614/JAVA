@@ -10,10 +10,9 @@ import java.awt.event.MouseListener;
 public class Masu extends Canvas implements MouseListener{
     /** 円の半径 */
     private int radius = 80;
-    private static Point activePoint;
     private Point point;
     private Piece piece;
-    private static boolean click = false;
+    ClickLintener clickLintener;
 
 
     Masu(int x, int y){
@@ -27,20 +26,10 @@ public class Masu extends Canvas implements MouseListener{
             this.radius = r;
     }
 
-    public static void setClick(boolean click) {
-        Masu.click = click;
-    }
-    public static boolean getClick(){
-        return click;
-    }
-
     public Piece getPiece() {
         return piece;
     }
 
-    public static Point getActivePoint() {
-        return activePoint;
-    }
 
     public void paint(Graphics g){
         int w = this.getWidth();
@@ -58,8 +47,7 @@ public class Masu extends Canvas implements MouseListener{
     public void mouseClicked(MouseEvent e)
     {
         System.out.println("Click  X=" + point.getX() + "  Y=" + point.getY());
-        activePoint = new Point(point.getX(),point.getY());
-        click = true;
+        clickLintener.MasuClick();
     }
 
     public void mousePressed(MouseEvent e){}

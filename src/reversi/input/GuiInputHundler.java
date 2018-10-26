@@ -1,11 +1,17 @@
 package reversi.input;
 
+/**
+ * フレーム内でgetpointをimplementする
+ * 配列で渡さなくもROBを渡してよい
+ * Masuがクリックされた時の処理をインターフェースを使ってframeで実装する
+ */
+
 import reversi.system.*;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-public class GuiInputHundler implements PieceInputHandler,Runnable {
+public class GuiInputHundler implements PieceInputHandler,Runnable,ClickLintener{
     Thread th;
     Flow flow;
     Point point;
@@ -38,7 +44,8 @@ public class GuiInputHundler implements PieceInputHandler,Runnable {
                     tmpPiece[y][x] = board.getPiece(x,y);
                 }
             }
-            ReversiFrame.setBoard(tmpPiece);
+            reversiFrame.setBoard(tmpPiece);
+
             break;
         }
         return Masu.getActivePoint();

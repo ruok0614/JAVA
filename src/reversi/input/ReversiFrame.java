@@ -8,7 +8,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 
 public class ReversiFrame extends Frame {
-    private static Piece[][] board;
+    private Piece[][] board;
 
     public ReversiFrame(int width,int height){
         init();
@@ -16,8 +16,8 @@ public class ReversiFrame extends Frame {
 
     }
 
-    public static void setBoard(Piece[][] board) {
-        ReversiFrame.board = board;
+    public void setBoard(Piece[][] board) {
+        this.board = board;
     }
 
     public void init(){
