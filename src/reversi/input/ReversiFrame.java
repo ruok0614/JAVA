@@ -9,10 +9,13 @@ import java.awt.event.WindowAdapter;
 
 public class ReversiFrame extends Frame {
     private Piece[][] board;
+    private boolean isClick;
 
     public ReversiFrame(int width,int height){
         init();
+        isClick = false;
         board = new Piece[height][width];
+        addWindowListener(new Ada());
 
     }
 
@@ -31,10 +34,12 @@ public class ReversiFrame extends Frame {
         setLayout(gridLayout);
         for(int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
-                masu[y][x] = new Masu(x,y);
+                //masu[y][x] = new Masu(x,y);
                 add(masu[y][x]);
             }
         }
+
+
     }
     public Piece boardColor(int x,int y,Board board){
         return board.getPiece(x,y);

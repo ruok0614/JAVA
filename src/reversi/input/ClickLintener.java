@@ -1,5 +1,7 @@
 package reversi.input;
 
+import reversi.system.Point;
+
 public interface ClickLintener {
-    void MasuClick();
+    void MasuClick(Point point);
 }

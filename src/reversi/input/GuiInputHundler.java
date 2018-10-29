@@ -14,15 +14,16 @@ import java.awt.event.MouseListener;
 public class GuiInputHundler implements PieceInputHandler,Runnable,ClickLintener{
     Thread th;
     Flow flow;
-    Point point;
+    Point activePoint;
     ReversiFrame reversiFrame;
+    private boolean isClick;
     private int width;
     private int height;
 
     public GuiInputHundler(int width,int height,ReversiFrame reversiFrame) {
         this.width = width;
         this.height = height;
-
+        isClick = false;
         this.reversiFrame = reversiFrame;
         th = new Thread(this);
 
@@ -38,17 +39,19 @@ public class GuiInputHundler implements PieceInputHandler,Runnable,ClickLintener
     @Override
     public Point getPoint(ReadOnlyBoard board, Piece piece) {
         Piece[][] tmpPiece = new Piece[board.getHeight()][board.getWidth()];
-        while (Masu.getClick()){
-            for(int y = 0; y < board.getHeight();y++){
-                for(int x = 0; x < board.getWidth();x++){
-                    tmpPiece[y][x] = board.getPiece(x,y);
-                }
-            }
-            reversiFrame.setBoard(tmpPiece);
+        while (!isClick){
 
-            break;
         }
-        return Masu.getActivePoint();
+        System.out.println(activePoint.getX());
+
+        return activePoint;
+    }
+
+    @Override
+    public void MasuClick(Point point) {
+        isClick = true;
+        activePoint = point;
+
     }
 
     @Override

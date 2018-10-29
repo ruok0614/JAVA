@@ -1,4 +1,4 @@
-package reversi.input;
+package reversi.gui;
 
 import reversi.system.Piece;
 import reversi.system.Point;
@@ -7,25 +7,19 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-public class Masu extends Canvas implements MouseListener{
+public class Masu extends Canvas  implements MouseListener {
     /** 円の半径 */
     private int radius = 80;
+    MasuClick masuClick;
     private Point point;
     private Piece piece;
-    ClickLintener clickLintener;
 
-
-    Masu(int x, int y,ClickLintener clickLintener){
+    Masu(int x, int y, MasuClick masuClick){
         point = new Point(x, y);
         this.piece = Piece.NONE;
         setBackground(Color.GREEN);
         addMouseListener(this);
-        this.clickLintener = clickLintener;
-
-    }
-
-    public void setRadius( int r){
-            this.radius = r;
+        this.masuClick = masuClick;
     }
 
     public Piece getPiece() {
@@ -49,18 +43,19 @@ public class Masu extends Canvas implements MouseListener{
                 g.fillOval( w/2-radius/2, h/2-radius/2, radius, radius);
                 break;
             case NONE:
+                g.drawRect(0, 0, w, h);
                 break;
         }
+    }
 
-   }
     public void mouseClicked(MouseEvent e)
     {
         System.out.println("Click  X=" + point.getX() + "  Y=" + point.getY());
-        clickLintener.MasuClick(point);
+        masuClick.masuClick(point);
     }
-
     public void mousePressed(MouseEvent e){}
     public void mouseReleased(MouseEvent e){}
     public void mouseEntered(MouseEvent e){}
     public void mouseExited(MouseEvent e){}
+
 }
