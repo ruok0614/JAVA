@@ -5,6 +5,8 @@ package reversi.system;
  * ゲッターセッターはセットで置く
  * 全部の関数にドキュメントコメントを書く
  * 最初はインプットはんどらーのコンソール版を作る
+ *テスト　境界値分析
+ * 
  */
 public class Board implements ReadOnlyBoard{
     public static final int DIRECTION_NUM = 8;
@@ -46,10 +48,6 @@ public class Board implements ReadOnlyBoard{
 
     public Piece getPiece(int x,int y){
         return board[y][x];
-    }
-
-    public Piece[][] getBoard() {
-        return board;
     }
 
     public boolean check(int x, int y, Piece piece){

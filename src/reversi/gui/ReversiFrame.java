@@ -11,7 +11,7 @@ public class ReversiFrame extends java.awt.Frame implements MasuClick, PieceInpu
     private int boardHeight;
     private Thread th;
     private Flow flow;
-    private boolean isClick;
+    private volatile boolean isClick; //
     private Point activePoint;
     private Masu[][] masu;
 
@@ -71,17 +71,30 @@ public class ReversiFrame extends java.awt.Frame implements MasuClick, PieceInpu
         repaint();
 
         while (!isClick){
-
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
-        masu[activePoint.getY()][activePoint.getX()].setPiece(piece);
-        repaint();
+//        masu[activePoint.getY()][activePoint.getX()].setPiece(piece);
+//        repaint();
         setClick(false);
         return activePoint;
     }
 
     @Override
     public void onFinish(ReadOnlyBoard board) {
+
+    }
+    public void paint(Graphics g){
+        super.paint(g);
+        for(int y = 0; y < boardHeight; y++) {
+            for (int x = 0; x < boardWidth; x++) {
+                masu[y][x].repaint();
+            }
+        }
 
     }
 
