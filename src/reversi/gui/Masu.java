@@ -13,6 +13,7 @@ public class Masu extends Canvas  implements MouseListener {
     MasuClick masuClick;
     private Point point;
     private Piece piece;
+    private boolean canset;
 
     Masu(int x, int y, MasuClick masuClick){
         point = new Point(x, y);
@@ -20,6 +21,11 @@ public class Masu extends Canvas  implements MouseListener {
         setBackground(Color.GREEN);
         addMouseListener(this);
         this.masuClick = masuClick;
+        canset = false;
+    }
+
+    public void setCanset(boolean canset) {
+        this.canset = canset;
     }
 
     public Piece getPiece() {
@@ -30,19 +36,27 @@ public class Masu extends Canvas  implements MouseListener {
         this.piece = piece;
     }
 
+
     public void paint(Graphics g){
         int w = this.getWidth();
         int h = this.getHeight();
         switch (piece){
             case WHITE:
+                setBackground(Color.GREEN);
                 g.setColor( Color.WHITE);
                 g.fillOval( w/2-radius/2, h/2-radius/2, radius, radius);
                 break;
             case BLACK:
+                setBackground(Color.GREEN);
                 g.setColor( Color.BLACK);
                 g.fillOval( w/2-radius/2, h/2-radius/2, radius, radius);
                 break;
             case NONE:
+                if(canset){
+                    setBackground(Color.LIGHT_GRAY);
+                }else {
+                    setBackground(Color.GREEN);
+                }
                 g.drawRect(0, 0, w, h);
                 break;
         }

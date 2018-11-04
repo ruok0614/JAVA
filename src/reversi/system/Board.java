@@ -151,11 +151,15 @@ public class Board implements ReadOnlyBoard{
                 if(piece == getPiece(varX,varY) && acutuallySet){
                     varY -= allDirection[i][Y];
                     varX -= allDirection[i][X];
-                    do {
+                    board[varY][varX] = piece == Piece.BLACK?Piece.BLACK:Piece.WHITE;
+                    varY -= allDirection[i][Y];
+                    varX -= allDirection[i][X];
+//                    board[varY][varX] = piece == Piece.BLACK?Piece.BLACK:Piece.WHITE;
+                    while(!(varX == x && varY == y)){
                         board[varY][varX] = piece == Piece.BLACK?Piece.BLACK:Piece.WHITE;
                         varY -= allDirection[i][Y];
                         varX -= allDirection[i][X];
-                    }while(varX != x && varY != y);
+                    }
                     flag = true;
                     break;
                 }else if(piece == getPiece(varX,varY) && !acutuallySet){
