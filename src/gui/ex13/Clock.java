@@ -4,10 +4,12 @@ import java.util.Calendar;
 
 import static java.lang.Thread.sleep;
 
+
 class Clock implements Runnable{
     private int h;           //時を入れる変数を宣言
     private int m;           //分を入れる変数を宣言
     private int s;           //秒を入れる変数を宣言
+
 
     public int getH() {
         return h;
