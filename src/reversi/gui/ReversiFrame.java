@@ -67,7 +67,6 @@ public class ReversiFrame extends java.awt.Frame implements MasuClick, PieceInpu
             for (int x = 0; x < boardWidth; x++) {
                 if(board.getPiece(x,y) == Piece.NONE ) {
                     if (board.check(x, y, piece)) {
-                        System.out.print("＋");
                         masu[y][x].setCanset(true);
                     } else if (!board.check(x, y, piece)) {
                         masu[y][x].setCanset(false);
@@ -95,23 +94,34 @@ public class ReversiFrame extends java.awt.Frame implements MasuClick, PieceInpu
 
     @Override
     public void onFinish(ReadOnlyBoard board) {
+        for(int y = 0; y < boardHeight; y++) {
+            for (int x = 0; x < boardWidth; x++) {
+                masu[y][x].setPiece(board.getPiece(x,y));
+            }
+        }
+        repaint();
         int whiteNum;
         int blackNum;
         whiteNum = board.getCountOf(Piece.WHITE);
         blackNum = board.getCountOf(Piece.BLACK);
 
         String winStr;
-
+        System.out.println("finish");
         if(whiteNum > blackNum){
             winStr = "白の勝ち";
         }else if(whiteNum < blackNum){
-            winStr = "黒の勝ち";
+            winStr =  "黒の勝ち";
         }else {
-            winStr = "引き分け";
+            winStr =  "引き分け";
         }
+
+        Dialog winDialog = new Dialog(this);
+        winDialog.setSize(100,100);
         Label winLabel = new Label(winStr);
-        add(winLabel);
-        show();
+        Label winLabel2 = new Label(String.format("白：%02d　黒：%02d\n",blackNum,whiteNum));
+        winDialog.add(winLabel2);
+        winDialog.add(winLabel);
+        winDialog.show();
 
 
     }
