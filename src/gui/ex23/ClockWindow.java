@@ -24,15 +24,7 @@ public class ClockWindow extends JWindow {
     Map colorMap;
     String activeFontColor;
     InputHundler inputHundler;
-    {
-        colorMap = new HashMap<String, java.awt.Color>();
-        colorMap.put("Yellow", Color.YELLOW);
-        colorMap.put("Green", Color.GREEN);
-        colorMap.put("White", Color.WHITE);
-        colorMap.put("Black",Color.BLACK);
-        colorMap.put("Red",Color.RED );
 
-    }
 
     public ClockWindow(JFrame owner){
         super(owner);
@@ -44,19 +36,15 @@ public class ClockWindow extends JWindow {
 
         addMouseListener( new MouseAction()); //マウスを最初に掴んだ時
         addMouseMotionListener( new MouseAction()); //マウスをドラッグした時
-        popUpMenue = new PopUpMenue(){
-                public void actionPerformed(ActionEvent e){
-                    System.out.println(e.paramString());
-                    activeFontColor = e.getActionCommand();
-                }
-        };
+        popUpMenue = new PopUpMenue();
 
         clockPaint = new ClockPaint(){
             public void paintComponent(Graphics g){
                 super.paintComponent(g);
-                Font font = new Font("ＭＳ Ｐゴシック",Font.PLAIN,50);
-                g.setColor((Color)colorMap.get(activeFontColor));
+                Font font = new Font("ＭＳ Ｐゴシック",Font.PLAIN,popUpMenue.changeFontSize.size);
+                g.setColor(popUpMenue.changeColor.color);
                 setFont(font);
+                this.setSize( popUpMenue.changeFontSize.size * 6, (int) (popUpMenue.changeFontSize.size * 3.2));
                 g.drawString(String.format("%02d:%02d:%02d",clock.getH(),clock.getM(),clock.getS()),50,80);
             }
         };
