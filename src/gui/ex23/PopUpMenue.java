@@ -87,21 +87,22 @@ public class PopUpMenue extends JPopupMenu implements ActionListener {
     }
 
     class ChangeColor extends AbstractAction{
-        Map colorMap;
+        Map colorMap;//定数で置いたほうがいい
+
         {
             colorMap = new HashMap<String, java.awt.Color>();
             colorMap.put("YELLOW", Color.YELLOW);
             colorMap.put("GREEN", Color.GREEN);
             colorMap.put("WHITE", Color.WHITE);
-            colorMap.put("BLACK",Color.BLACK);
-            colorMap.put("RED",Color.RED );
-            colorMap.put("CYAN",Color.CYAN );
-            colorMap.put("MAGENTA",Color.MAGENTA);
-            colorMap.put("ORANGE",Color.ORANGE);
-            colorMap.put("pink",Color.pink);
-            colorMap.put("DARK_GRAY",Color.DARK_GRAY);
+            colorMap.put("BLACK", Color.BLACK);
+            colorMap.put("RED", Color.RED);
+            colorMap.put("CYAN", Color.CYAN);
+            colorMap.put("MAGENTA", Color.MAGENTA);
+            colorMap.put("ORANGE", Color.ORANGE);
+            colorMap.put("pink", Color.pink);
+            colorMap.put("DARK_GRAY", Color.DARK_GRAY);
+            colorMap.put("Sarry", new Color(0xff8080ff));
         }
-
         Color color = Color.BLACK;
 
         public void actionPerformed(ActionEvent e){
