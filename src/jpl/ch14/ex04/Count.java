@@ -1,11 +1,15 @@
-package jpl.ch14.ex03;
+package jpl.ch14.ex04;
+
+/**
+ * saticメソッドとstatic変数を使う
+ */
 
 public class Count {
-    int num ;
+    static int num ;
     Count(int num){
         this.num = num;
     }
-    public void add(int addNum){
+    public static void add(int addNum){
         num += addNum;
         System.out.println(num);
     }
