@@ -10,8 +10,9 @@ package jpl.ch14.ex06;
 public class Main {
     public static void main(String args[]){
         Clock clock = new Clock();
+        Clock clock2 = new Clock();
         Runnable fif = clock::fifteenMessage;
-        Runnable seven = clock::sevenWait;
+        Runnable seven = clock2::sevenWait;
         Thread th1 = new Thread(seven);
         th1.start();
         try {

@@ -31,10 +31,9 @@ class Clock{
 
     }
 
-    public synchronized void fifteenMessage(){
+    public void fifteenMessage(){
 
         while(true){
-
             long tempTime = System.currentTimeMillis();
             elapsedTime = (tempTime - startTime)/1000;
             System.out.println(elapsedTime);
@@ -43,7 +42,9 @@ class Clock{
             }
             try{
                 sleep(1000);//スリープ１秒
-                notifyAll();
+                synchronized (this) {
+                    notifyAll();
+                }
             }catch(InterruptedException e){
             }
         }
