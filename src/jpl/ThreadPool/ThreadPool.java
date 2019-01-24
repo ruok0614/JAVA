@@ -70,9 +70,9 @@ public class ThreadPool {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-            this.isActive = true;
+            threads[i].start();
         }
+        this.isActive = true;
     }
 
     /**
@@ -83,12 +83,6 @@ public class ThreadPool {
     public synchronized void stop() {
         if(!isActive){
             throw new IllegalStateException("threads has not been started.");
-        }
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
         for (int i = 0; i < numberOfThreads; i++) {
             threads[i].stopThread();
@@ -116,7 +110,6 @@ public class ThreadPool {
         if (!this.isActive)
             throw new IllegalStateException("Not Implemented Yet");
 
-        System.out.println("add");
         queue.add(runnable);
         synchronized (queue) {
             queue.notify();
@@ -133,30 +126,23 @@ public class ThreadPool {
         DispatchThread(List<Runnable> queue) throws InterruptedException {
             this.queue = queue;
             isStop = false;
-            System.out.println("start");
-            this.start();
-
         }
         public void run() {
-            System.out.println("loop in!!");
             // スリープ入れる
-            while (true) {
+            while (!isStop || queue.size() > 0) {
                 Runnable runnable = null;
                 synchronized (this.queue) {
                     if (this.queue.size() > 0) {
                         runnable = this.queue.remove(0);
                     }else{
-                        System.out.println("wait!!");
                         try {
-                            this.queue.wait();
-                            System.out.println("wait解除");
+                            this.queue.wait(100);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
                 }
                 if (runnable != null) {
-                    System.out.println("run");
                     runnable.run();
                 }
                 try {
@@ -164,19 +150,14 @@ public class ThreadPool {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if(isStop){
-                    break;
-                }
             }
         }
 
         void stopThread(){
-            System.out.println("stop");
             synchronized (queue){
                 queue.notifyAll();
             }
                 isStop = true;
-
         }
     }
 

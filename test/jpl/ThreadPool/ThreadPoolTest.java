@@ -146,7 +146,6 @@ public class ThreadPoolTest {
         t.waitForRunCount(10);
         tp.stop();
     }
-
     @Test
     public void testComplexRepeatedDispatch() {
         ThreadPool tp = new ThreadPool(10,10);
@@ -159,7 +158,6 @@ public class ThreadPoolTest {
         t.waitForRunCount(1000);
         tp.stop();
     }
-    @Ignore
     @Test
     public void testComplexRepeatedDispatch2() {
         ThreadPool tp = new ThreadPool(10,10);
