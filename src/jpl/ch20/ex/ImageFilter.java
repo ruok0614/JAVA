@@ -8,7 +8,8 @@ import java.nio.ByteBuffer;
  */
 public class ImageFilter {
 
-    private final String DIR_NAME  = "C:\\Users\\p000527232\\mygit\\JAVA\\src\\jpl\\ch20\\ex\\";
+    //private final String DIR_NAME  = "C:\\Users\\p000527232\\mygit\\JAVA\\src\\jpl\\ch20\\ex\\";
+    private final String DIR_NAME  = "C:\\Users\\qazws\\IdeaProjects\\java\\src\\jpl\\ch20\\ex\\";
     private final String FILE_NAME  = "tes.bmp";
     private final int HEADER_SIZE_POSITION = 14;
     private final int HEADER_INFO_SIZE_LENGTH = 4;
@@ -48,25 +49,37 @@ public class ImageFilter {
             byte[] imgWidthByteArray = new byte[HEADER_INFO_WIDTH_LENGTH];
             fInS.read(imgWidthByteArray,0,HEADER_INFO_WIDTH_LENGTH);
             imgWidth = nByteConversion(imgWidthByteArray);
+            fos.write(imgWidthByteArray, 0, HEADER_INFO_WIDTH_LENGTH);
 
             //　ヘッダー情報読み取り（画像の高さ）
             byte[] imgHeightByteArray = new byte[HEADER_INFO_HEIGHT_LENGTH];
             fInS.read(imgHeightByteArray,0,HEADER_INFO_HEIGHT_LENGTH);
             imgHeight = nByteConversion(imgHeightByteArray);
+            fos.write(imgWidthByteArray, 0, HEADER_INFO_HEIGHT_LENGTH);
 
             //　ヘッダー情報読み取り（その他）
-            byte[] infoHeader = new byte[HEADER_INFO_SIZE_LENGTH - 4 ];
-            fInS.read(infoHeader,0,HEADER_INFO_SIZE_LENGTH- 4);
-            fos.write(infoHeader, 0, HEADER_INFO_SIZE_LENGTH- 4);
+            byte[] infoHeader = new byte[infoHeaderLength - HEADER_INFO_SIZE_LENGTH - HEADER_INFO_WIDTH_LENGTH -HEADER_INFO_HEIGHT_LENGTH];
+            fInS.read(infoHeader,0,infoHeaderLength - HEADER_INFO_SIZE_LENGTH -  HEADER_INFO_WIDTH_LENGTH -HEADER_INFO_HEIGHT_LENGTH);
+            fos.write(infoHeader, 0, infoHeaderLength -  HEADER_INFO_SIZE_LENGTH- HEADER_INFO_WIDTH_LENGTH -HEADER_INFO_HEIGHT_LENGTH);
 
-
-            byte[] buffer = new byte[3];
             int len = 0;
 
-            while((len = fInS.read(buffer)) != -1) {
-                buffer[0] = 0;
-                bos.write(buffer, 0, len);
+            ColorImage img = new ColorImage(imgWidth,imgHeight);
+            byte[] buffer = new byte[3];
+            for (int y = 0; y < imgHeight; y++){
+                for (int x = 0; x < imgWidth; x++){
+                    fInS.read(buffer);
+                    img.setPixcel(x,y,buffer[0],buffer[1],buffer[2]);
+                }
             }
+            // img.averageFilter(5);
+            // img.ySobelFilter();
+            img.gaussianFilter(3,1);
+            byte[] imgBuf = img.convertBuffer();
+
+
+
+            fos.write(imgBuf,0,imgHeight*imgWidth*3);
 
 
         } catch (Exception e) {
@@ -93,9 +106,10 @@ public class ImageFilter {
         int result = 0;
         for(int i = 0; i <bytes.length; i++){
             if(bytes[i] < 0 ){
-                bytes[i] = bytes[i];
+                result += (256 + bytes[i])* Math.pow(256,i);
+            } else {
+                result += bytes[i] * Math.pow(256, i);
             }
-            result += bytes[i] * Math.pow(256,i);
         }
         return result;
     }
