@@ -124,22 +124,10 @@ public class ColorImage {
     }
 
     private int byteToInt(byte b){
-        int res;
-        if(b < 0){
-            res = (int)b + 256;
-        }else {
-            res = (int)b;
-        }
-        return res;
+        return (int)b & 0xFF;
     }
     private byte intToByte(int i){
-        int res;
-        if(i > 127){
-            res = i - 255;
-        }else {
-            res = i;
-        }
-        return (byte)res;
+        return (byte)i;
     }
 
 }

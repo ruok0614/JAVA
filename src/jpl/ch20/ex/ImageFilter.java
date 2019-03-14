@@ -8,8 +8,8 @@ import java.nio.ByteBuffer;
  */
 public class ImageFilter {
 
-    //private final String DIR_NAME  = "C:\\Users\\p000527232\\mygit\\JAVA\\src\\jpl\\ch20\\ex\\";
-    private final String DIR_NAME  = "C:\\Users\\qazws\\IdeaProjects\\java\\src\\jpl\\ch20\\ex\\";
+    private final String DIR_NAME  = "C:\\Users\\p000527232\\mygit\\JAVA\\src\\jpl\\ch20\\ex\\";
+    // private final String DIR_NAME  = "C:\\Users\\qazws\\IdeaProjects\\java\\src\\jpl\\ch20\\ex\\";
     private final String FILE_NAME  = "tes.bmp";
     private final int HEADER_SIZE_POSITION = 14;
     private final int HEADER_INFO_SIZE_LENGTH = 4;
@@ -73,8 +73,8 @@ public class ImageFilter {
                 }
             }
             // img.averageFilter(5);
-            // img.ySobelFilter();
-            img.gaussianFilter(3,1);
+             img.ySobelFilter();
+            // img.gaussianFilter(7,1);
             byte[] imgBuf = img.convertBuffer();
 
 
