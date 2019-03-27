@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.Member;
 
 public class View extends JFrame implements ActionListener,IObserver {
@@ -53,6 +55,19 @@ public class View extends JFrame implements ActionListener,IObserver {
         constructorlist = new JList(constructorModel);
         JScrollPane constructorPanel = new JScrollPane(constructorlist);
         constructorlist.setLayoutOrientation(JList.VERTICAL);
+        constructorlist.addMouseListener(new MouseAdapter() {
+            // ダブルクリックで要素を取得
+            public void mouseClicked(MouseEvent evt) {
+                JList list = (JList)evt.getSource();
+                if (evt.getClickCount() == 2) {
+                    String selectedValue = (String)list.getSelectedValue();
+                    System.out.println(selectedValue);
+                    if (selectedValue != null) {
+                        controller.selectedValue(selectedValue);
+                    }
+                }
+            }
+        });
 
         newInstancePanel.add(constructorPanel,BorderLayout.CENTER);
 
@@ -62,6 +77,7 @@ public class View extends JFrame implements ActionListener,IObserver {
         if(e.getSource() == classNameGetButton){
             controller.pushedclassNameGetButton(classNameTextArea.getText());
         }
+
 
     }
 
@@ -74,10 +90,7 @@ public class View extends JFrame implements ActionListener,IObserver {
             System.out.println(decl);
             constructorModel.addElement(decl);
 
-
-
         }
         constructorlist.ensureIndexIsVisible(constructorModel.getSize() + 1);
-
     }
 }
