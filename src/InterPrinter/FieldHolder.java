@@ -17,9 +17,9 @@ public class FieldHolder {
     public void setConstructorList(Member[] constructorList) {
         this.constructorList = constructorList;
     }
-    public 1 setSelectField(String selectField) {
+    public Object selectConstructor(String selectConstructor) {
         try {
-            String a = ( String ) Class.forName(selectField).getDeclaredConstructor().newInstance();
+            Object a =  Class.forName(selectConstructor).getDeclaredConstructor().newInstance();
             return true;
 
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException

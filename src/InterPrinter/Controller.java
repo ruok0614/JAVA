@@ -26,7 +26,7 @@ public class Controller {
     }
 
     public void selectedValue(String value) {
-        Object a = fieldHolder.setSelectField(value);
+        Object a = fieldHolder.selectConstructor(value);
     }
 
     /**
@@ -36,9 +36,5 @@ public class Controller {
     public void addObserver(IObserver observer){
         this.observer.add(observer);
     }
-
-
-
-
 
 }
