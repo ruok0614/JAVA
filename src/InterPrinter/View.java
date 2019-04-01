@@ -8,7 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Member;
 
-public class View extends JFrame implements ActionListener,IObserver {
+public class View extends JFrame implements ActionListener, IConstructorObserver {
     private JPanel newInstancePanel;
     private JTextField classNameTextArea;
     private JList constructorlist;
@@ -19,8 +19,7 @@ public class View extends JFrame implements ActionListener,IObserver {
     View(){
         init();
         placeNewInstance();
-        controller = new Controller();
-        controller.addObserver(this);
+        controller = new Controller(this);
     }
 
 
@@ -77,7 +76,6 @@ public class View extends JFrame implements ActionListener,IObserver {
         if(e.getSource() == classNameGetButton){
             controller.pushedclassNameGetButton(classNameTextArea.getText());
         }
-
 
     }
 
