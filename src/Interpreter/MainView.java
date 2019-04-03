@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 
 public class MainView extends JFrame implements ConstructorObserver{
@@ -61,9 +62,11 @@ public class MainView extends JFrame implements ConstructorObserver{
                 JList list = (JList)evt.getSource();
                 if (evt.getClickCount() == 2) {
                     String selectedValue = (String)list.getSelectedValue();
+                    //context.getConstructorHolder().newInstance(list.getSelectedIndex());
+                    InstancePanel(selectedValue);
                     System.out.println(selectedValue);
                     if (selectedValue != null) {
-                        context.getConstructorHolder().selectedConstructor(list.getSelectedIndex());
+                        //context.getConstructorHolder().newInstance(list.getSelectedIndex());
                     }
                 }
             }
@@ -72,8 +75,34 @@ public class MainView extends JFrame implements ConstructorObserver{
 
     }
 
+    public void InstancePanel(String argsText){
+        JFrame instanceJframe = new JFrame("new Instance");
+        instanceJframe.setSize(250,130);
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JPanel instancePanel = new JPanel();
+        Container contentPane = instanceJframe.getContentPane();
+        JLabel argsLabel = new JLabel("引数");
+        HintTextField argsTextArea = new HintTextField(20);
+        argsTextArea.setHint(argsText);
+        JLabel nameLabel = new JLabel("名前");
+        JTextField objNameArea = new JTextField(20);
+        JButton generateButton = new JButton("生成");
+        generateButton.addActionListener(e -> {
+            if(e.getSource() == generateButton){
+                context.getConstructorHolder().serchConstructor(classNameTextArea.getText());
+            }
+        });
+        instancePanel.add(argsLabel);
+        instancePanel.add(argsTextArea);
+        instancePanel.add(nameLabel);
+        instancePanel.add(objNameArea);
+        instancePanel.add(generateButton);
+        contentPane.add(instancePanel,BorderLayout.CENTER);
+        instanceJframe.setVisible(true);
+    }
+
     @Override
-    public void showConstructor(Member[] constructorArray){
+    public void showConstructor(Constructor[] constructorArray){
         for (Member m:constructorArray){
             if(m.getDeclaringClass() == Object.class)
                 continue;
@@ -83,5 +112,10 @@ public class MainView extends JFrame implements ConstructorObserver{
 
         }
         constructorList.ensureIndexIsVisible(constructorModel.getSize() + 1);
+    }
+
+    @Override
+    public void showSetFieldProperty(Constructor constructor){
+
     }
 }

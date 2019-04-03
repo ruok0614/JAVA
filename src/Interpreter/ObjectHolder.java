@@ -12,7 +12,7 @@ public class ObjectHolder {
         this.methodHolder = methodHolder;
     }
 
-    public void newInstance(Constructor constructor){
+    public void newInstance(Constructor constructor,String objName, Object args){
         try {
             Object a = constructor.newInstance("aa");
             System.out.println(a);
