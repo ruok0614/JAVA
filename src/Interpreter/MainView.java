@@ -29,7 +29,6 @@ public class MainView extends JFrame implements ConstructorObserver{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         context = new Context();
         mainPanel = new JPanel();
-        observer = this;
         ConstructorList();
 
     }
@@ -38,7 +37,7 @@ public class MainView extends JFrame implements ConstructorObserver{
         classNameTextArea = new JTextField(20);
         classNameGetButton = new JButton("取得");
 
-        context.getConstructorHolder().addObserver(observer);
+        context.getConstructorHolder().addObserver(this);
 
         classNameGetButton.addActionListener(e -> {
             if(e.getSource() == classNameGetButton){

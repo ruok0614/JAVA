@@ -30,7 +30,7 @@ public class ConstructorHolder {
     public void newInstance(int indexNum, Object args){
         Constructor claszz = constructorlist[indexNum];
         observers.get(0).showSetFieldProperty(claszz);
-        objectHolder.newInstance(claszz,"aa",args);
+//        objectHolder.newInstance(claszz,"aa",args);
     }
 
     /**

@@ -12,9 +12,9 @@ public class ObjectHolder {
         this.methodHolder = methodHolder;
     }
 
-    public void newInstance(Constructor constructor,String objName, Object args){
+    public void newInstance(Constructor constructor,String objName, Object[] args){
         try {
-            Object a = constructor.newInstance("aa");
+            Object a = constructor.newInstance(args);
             System.out.println(a);
         } catch (InstantiationException e) {
             e.printStackTrace();
