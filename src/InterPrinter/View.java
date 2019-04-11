@@ -72,6 +72,8 @@ public class View extends JFrame implements ActionListener, IConstructorObserver
 
     }
 
+
+
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == classNameGetButton){
             controller.pushedclassNameGetButton(classNameTextArea.getText());

@@ -12,7 +12,7 @@ public class ConstructorHolder {
         observers = new ArrayList<IConstructorObserver>();
         addObserver(observer);
     }
-    public void serchConstructor(String inputText){
+    public void searchConstructor(String inputText){
         Class<?> clazz = null;
         try{
             clazz = Class.forName(inputText);

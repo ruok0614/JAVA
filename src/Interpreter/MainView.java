@@ -5,9 +5,11 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 
-public class MainView extends JFrame implements ConstructorObserver{
+public class MainView extends JFrame implements ConstructorObserver,MethodHolderObserver,FieldHolderObserver{
     private int width = 300;
     private int height =250;
     private JPanel mainPanel;
@@ -16,7 +18,10 @@ public class MainView extends JFrame implements ConstructorObserver{
     private JButton classNameGetButton;
     private DefaultListModel constructorModel;
     private JList constructorList;
-    private MainView observer;
+    private DefaultListModel objectModel;
+    private JList objectList;
+    private DefaultListModel fieldModel;
+    private JList fieldList;
 
     public MainView(){
         init();
@@ -29,7 +34,12 @@ public class MainView extends JFrame implements ConstructorObserver{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         context = new Context();
         mainPanel = new JPanel();
+        context.getConstructorHolder().addObserver(this);
+        context.getMethodHolder().addObserver(this);
+        context.getFieldHolder().addObserver(this);
         ConstructorList();
+        objectList();
+        fieldList();
 
     }
 
@@ -37,12 +47,12 @@ public class MainView extends JFrame implements ConstructorObserver{
         classNameTextArea = new JTextField(20);
         classNameGetButton = new JButton("取得");
 
-        context.getConstructorHolder().addObserver(this);
+
 
         classNameGetButton.addActionListener(e -> {
             if(e.getSource() == classNameGetButton){
                 System.out.println(classNameTextArea.getText());
-                context.getConstructorHolder().serchConstructor(classNameTextArea.getText());
+                context.getConstructorHolder().searchConstructor(classNameTextArea.getText());
             }
         });
         mainPanel.add(classNameTextArea);
@@ -61,11 +71,11 @@ public class MainView extends JFrame implements ConstructorObserver{
                 JList list = (JList)evt.getSource();
                 if (evt.getClickCount() == 2) {
                     String selectedValue = (String)list.getSelectedValue();
-                    //context.getConstructorHolder().newInstance(list.getSelectedIndex());
+                    //context.getConstructorHolder().createObject(list.getSelectedIndex());
                     InstancePanel(selectedValue);
                     System.out.println(selectedValue);
                     if (selectedValue != null) {
-                        //context.getConstructorHolder().newInstance(list.getSelectedIndex());
+                        //context.getConstructorHolder().createObject(list.getSelectedIndex());
                     }
                 }
             }
@@ -88,7 +98,7 @@ public class MainView extends JFrame implements ConstructorObserver{
         JButton generateButton = new JButton("生成");
         generateButton.addActionListener(e -> {
             if(e.getSource() == generateButton){
-                context.getConstructorHolder().serchConstructor(classNameTextArea.getText());
+                context.getConstructorHolder().newInstance(constructorList.getSelectedIndex(),argsTextArea.getText());
             }
         });
         instancePanel.add(argsLabel);
@@ -98,6 +108,22 @@ public class MainView extends JFrame implements ConstructorObserver{
         instancePanel.add(generateButton);
         contentPane.add(instancePanel,BorderLayout.CENTER);
         instanceJframe.setVisible(true);
+    }
+
+    public void objectList(){
+        objectModel = new DefaultListModel();
+        objectList = new JList(objectModel);
+        JScrollPane ObjectPanel = new JScrollPane(objectList);
+        objectList.setLayoutOrientation(JList.VERTICAL);
+        mainPanel.add(ObjectPanel,BorderLayout.LINE_END);
+    }
+
+    public void fieldList(){
+        fieldModel = new DefaultListModel();
+        fieldList = new JList(fieldModel);
+        JScrollPane fieldPanel = new JScrollPane(fieldList);
+        fieldList.setLayoutOrientation(JList.VERTICAL);
+        mainPanel.add(fieldPanel,BorderLayout.LINE_END);
     }
 
     @Override
@@ -116,5 +142,29 @@ public class MainView extends JFrame implements ConstructorObserver{
     @Override
     public void showSetFieldProperty(Constructor constructor){
 
+    }
+
+    public void showMethodList(Method[] methodlist){
+        for (Method m:methodlist){
+            if(m.getDeclaringClass() == Object.class)
+                continue;
+            String decl = m.toString();
+            System.out.println(decl);
+            objectModel.addElement(decl);
+
+        }
+        objectList.ensureIndexIsVisible(objectModel.getSize() + 1);
+    }
+
+    public void showFieldList(Field[] fieldlist){
+        for (Field f:fieldlist){
+            if(f.getDeclaringClass() == Object.class)
+                continue;
+            String decl = f.toString();
+            System.out.println(decl);
+            fieldModel.addElement(decl);
+
+        }
+        fieldList.ensureIndexIsVisible(fieldModel.getSize() + 1);
     }
 }
