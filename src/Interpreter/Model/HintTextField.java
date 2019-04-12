@@ -1,4 +1,4 @@
-package Interpreter;
+package Interpreter.Model;
 
 import java.awt.Color;
 import java.awt.Font;

@@ -1,4 +1,4 @@
-package Interpreter;
+package Interpreter.Model;
 
 public class Context {
     private ConstructorHolder constructorHolder;

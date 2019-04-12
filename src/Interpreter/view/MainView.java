@@ -1,4 +1,6 @@
-package Interpreter;
+package Interpreter.view;
+
+import Interpreter.Model.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
-public class MainView extends JFrame implements ConstructorObserver,MethodHolderObserver,FieldHolderObserver{
+public class MainView extends JFrame implements ConstructorObserver, MethodHolderObserver, FieldHolderObserver {
     private int width = 300;
     private int height =250;
     private JPanel mainPanel;
@@ -30,7 +32,7 @@ public class MainView extends JFrame implements ConstructorObserver,MethodHolder
     private void init(){
         setSize(width,height);
         // ユーザーがこのフレームの「クローズ」を開始したときに、デフォルトで実行される処理を設定します。
-        setTitle("InterPreter");
+        setTitle("Interprete");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         context = new Context();
         mainPanel = new JPanel();

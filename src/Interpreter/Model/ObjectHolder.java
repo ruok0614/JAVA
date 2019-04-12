@@ -1,15 +1,21 @@
-package Interpreter;
+package Interpreter.Model;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ObjectHolder {
     FieldHolder fieldHolder;
     MethodHolder methodHolder;
+    List<ObjectHolderObserver> observers;
+    List<OBJ> objectList;
     ObjectHolder(FieldHolder fieldHolder, MethodHolder methodHolder){
         this.fieldHolder = fieldHolder;
         this.methodHolder = methodHolder;
+        observers = new ArrayList<ObjectHolderObserver>();
+        objectList = new ArrayList<OBJ>();
     }
 
     public void createObject(Constructor constructor, String objName, Object args){
@@ -25,5 +31,13 @@ public class ObjectHolder {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+    }
+
+    public void addObserver(ObjectHolderObserver observer){
+        observers.add(observer);
+    }
+
+    public void addOBJ(OBJ obj){
+        objectList.add(obj);
     }
 }

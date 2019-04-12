@@ -1,4 +1,4 @@
-package Interpreter;
+package Interpreter.Model;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
