@@ -26,10 +26,10 @@ public class ConstructorHolder {
         observers.get(0).showConstructor(constructorlist);
     }
 
-    public void newInstance(int indexNum, Object args){
+    public void newInstance(int indexNum, Object args,String name){
         Constructor claszz = constructorlist[indexNum];
         observers.get(0).showSetFieldProperty(claszz);
-        objectHolder.createObject(claszz,"aa", args);
+        objectHolder.createObject(claszz,name, args);
     }
 
     /**

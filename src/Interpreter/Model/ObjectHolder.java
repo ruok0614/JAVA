@@ -21,8 +21,9 @@ public class ObjectHolder {
     public void createObject(Constructor constructor, String objName, Object args){
         try {
             Object obj = constructor.newInstance(args);
-            methodHolder.addMethodList(obj);
-            fieldHolder.addFieldList(obj);
+            addOBJ(new OBJ(objName,obj));
+            observers.get(0).showObjectList(objectList);
+
 
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -39,5 +40,11 @@ public class ObjectHolder {
 
     public void addOBJ(OBJ obj){
         objectList.add(obj);
+    }
+
+    public void showFieldAndMethod(int index){
+        Object obj = objectList.get(index).getObj();
+        methodHolder.addMethodList(obj);
+        fieldHolder.addFieldList(obj);
     }
 }

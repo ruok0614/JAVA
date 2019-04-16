@@ -5,18 +5,40 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FieldHolder {
-    Field[] fieldlist;
+    List<Field> fieldlist;
+
+    public List<FieldHolderObserver> getObservers() {
+        return observers;
+    }
+
     private List<FieldHolderObserver> observers;
     public FieldHolder(){
         observers = new ArrayList<FieldHolderObserver>();
     }
+
     public void addFieldList(Object obj){
-        fieldlist = obj.getClass().getFields();
-        observers.get(0).showFieldList(fieldlist);
-        for (Field m:fieldlist) {
-            System.out.println(m);
+        try {
+            fieldlist = getFieldFromClass(obj.getClass());
+            observers.get(0).showFieldList(fieldlist);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Field> getFieldFromClass(Class clazz)
+            throws NoSuchFieldException {
+        List<Field> field = new ArrayList<>();
+        while (clazz != null) {
+            for (Field f:clazz.getDeclaredFields()){
+                field.add(f);
+            }
+            clazz = clazz.getSuperclass();
         }
 
+        if (field == null) {
+            throw new NoSuchFieldException();
+        }
+        return field;
     }
 
     /**

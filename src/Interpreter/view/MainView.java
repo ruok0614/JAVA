@@ -10,20 +10,23 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.util.List;
 
-public class MainView extends JFrame implements ConstructorObserver, MethodHolderObserver, FieldHolderObserver {
+public class MainView extends JFrame implements ConstructorObserver, MethodHolderObserver, FieldHolderObserver,ObjectHolderObserver {
     private int width = 300;
-    private int height =250;
+    private int height =650;
     private JPanel mainPanel;
     private JTextField classNameTextArea;
     private Context context;
     private JButton classNameGetButton;
     private DefaultListModel constructorModel;
     private JList constructorList;
-    private DefaultListModel objectModel;
-    private JList objectList;
+    private DefaultListModel methodModel;
+    private JList methodList;
     private DefaultListModel fieldModel;
     private JList fieldList;
+    private DefaultListModel objectModel;
+    private JList objectList;
 
     public MainView(){
         init();
@@ -39,9 +42,12 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         context.getConstructorHolder().addObserver(this);
         context.getMethodHolder().addObserver(this);
         context.getFieldHolder().addObserver(this);
+        context.getObjectHolder().addObserver(this);
         ConstructorList();
         objectList();
+        methodList();
         fieldList();
+
 
     }
 
@@ -89,6 +95,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
     public void InstancePanel(String argsText){
         JFrame instanceJframe = new JFrame("new Instance");
         instanceJframe.setSize(250,130);
+        instanceJframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JPanel instancePanel = new JPanel();
         Container contentPane = instanceJframe.getContentPane();
@@ -100,7 +107,8 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         JButton generateButton = new JButton("生成");
         generateButton.addActionListener(e -> {
             if(e.getSource() == generateButton){
-                context.getConstructorHolder().newInstance(constructorList.getSelectedIndex(),argsTextArea.getText());
+                context.getConstructorHolder().newInstance(constructorList.getSelectedIndex(),argsTextArea.getText(),objNameArea.getText());
+                instanceJframe.dispose();
             }
         });
         instancePanel.add(argsLabel);
@@ -112,11 +120,11 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         instanceJframe.setVisible(true);
     }
 
-    public void objectList(){
-        objectModel = new DefaultListModel();
-        objectList = new JList(objectModel);
-        JScrollPane ObjectPanel = new JScrollPane(objectList);
-        objectList.setLayoutOrientation(JList.VERTICAL);
+    public void methodList(){
+        methodModel = new DefaultListModel();
+        methodList = new JList(methodModel);
+        JScrollPane ObjectPanel = new JScrollPane(methodList);
+        methodList.setLayoutOrientation(JList.VERTICAL);
         mainPanel.add(ObjectPanel,BorderLayout.LINE_END);
     }
 
@@ -127,9 +135,28 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         fieldList.setLayoutOrientation(JList.VERTICAL);
         mainPanel.add(fieldPanel,BorderLayout.LINE_END);
     }
+    public void objectList(){
+        objectModel = new DefaultListModel();
+        objectList = new JList(objectModel);
+        JScrollPane objectPanel = new JScrollPane(objectList);
+        objectList.setLayoutOrientation(JList.VERTICAL);
+        mainPanel.add(objectPanel,BorderLayout.LINE_END);
+        objectList.addMouseListener(new MouseAdapter() {
+            // ダブルクリックで要素を取得
+            public void mouseClicked(MouseEvent evt) {
+                JList list = (JList)evt.getSource();
+                if (evt.getClickCount() == 2) {
+                    int selectedindex = list.getSelectedIndex();
+                    context.getObjectHolder().showFieldAndMethod(selectedindex);
+                }
+            }
+        });
+
+    }
 
     @Override
     public void showConstructor(Constructor[] constructorArray){
+        constructorModel.removeAllElements();
         for (Member m:constructorArray){
             if(m.getDeclaringClass() == Object.class)
                 continue;
@@ -146,19 +173,21 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
 
     }
 
-    public void showMethodList(Method[] methodlist){
+    public void showMethodList(List<Method> methodlist){
+        methodModel.removeAllElements();
         for (Method m:methodlist){
             if(m.getDeclaringClass() == Object.class)
                 continue;
             String decl = m.toString();
             System.out.println(decl);
-            objectModel.addElement(decl);
+            methodModel.addElement(decl);
 
         }
-        objectList.ensureIndexIsVisible(objectModel.getSize() + 1);
+        methodList.ensureIndexIsVisible(methodModel.getSize() + 1);
     }
 
-    public void showFieldList(Field[] fieldlist){
+    public void showFieldList(List<Field> fieldlist){
+        fieldModel.removeAllElements();
         for (Field f:fieldlist){
             if(f.getDeclaringClass() == Object.class)
                 continue;
@@ -168,5 +197,14 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
 
         }
         fieldList.ensureIndexIsVisible(fieldModel.getSize() + 1);
+    }
+    public void showObjectList(List<OBJ> obj){
+        objectModel.removeAllElements();
+        for (OBJ o:obj){
+            String decl = o.getName();
+            System.out.println(decl);
+            objectModel.addElement(decl);
+
+        }
     }
 }
