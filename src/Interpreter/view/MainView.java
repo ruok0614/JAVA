@@ -88,13 +88,14 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
                 }
             }
         });
+
         mainPanel.add(constructorPanel,BorderLayout.CENTER);
 
     }
 
     public void InstancePanel(String argsText){
         JFrame instanceJframe = new JFrame("new Instance");
-        instanceJframe.setSize(250,130);
+        instanceJframe.setSize(250,200);
         instanceJframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JPanel instancePanel = new JPanel();
@@ -125,6 +126,8 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         methodList = new JList(methodModel);
         JScrollPane ObjectPanel = new JScrollPane(methodList);
         methodList.setLayoutOrientation(JList.VERTICAL);
+        JLabel label = new JLabel("メソッド一覧");
+        mainPanel.add(label);
         mainPanel.add(ObjectPanel,BorderLayout.LINE_END);
     }
 
@@ -133,13 +136,38 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         fieldList = new JList(fieldModel);
         JScrollPane fieldPanel = new JScrollPane(fieldList);
         fieldList.setLayoutOrientation(JList.VERTICAL);
+        JLabel label = new JLabel("フィールド一覧");
+        mainPanel.add(label);
         mainPanel.add(fieldPanel,BorderLayout.LINE_END);
+
+        JTextField fieldTextArea = new JTextField(20);
+        JButton fieldChangeButton = new JButton("変更");
+        mainPanel.add(fieldTextArea);
+        mainPanel.add(fieldChangeButton);
+        fieldList.addMouseListener(new MouseAdapter() {
+            // ダブルクリックで要素を取得
+            public void mouseClicked(MouseEvent evt) {
+                JList list = (JList)evt.getSource();
+                if (evt.getClickCount() == 1) {
+                    fieldTextArea.setText(context.getFieldHolder().getFieldValue(list.getSelectedIndex()).toString());
+                }
+            }
+        });
+
+
     }
+
+    private void showField(int selectedIndex) {
+
+    }
+
     public void objectList(){
         objectModel = new DefaultListModel();
         objectList = new JList(objectModel);
         JScrollPane objectPanel = new JScrollPane(objectList);
         objectList.setLayoutOrientation(JList.VERTICAL);
+        JLabel label = new JLabel("オブジェクト一覧");
+        mainPanel.add(label);
         mainPanel.add(objectPanel,BorderLayout.LINE_END);
         objectList.addMouseListener(new MouseAdapter() {
             // ダブルクリックで要素を取得
@@ -194,7 +222,6 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
             String decl = f.toString();
             System.out.println(decl);
             fieldModel.addElement(decl);
-
         }
         fieldList.ensureIndexIsVisible(fieldModel.getSize() + 1);
     }

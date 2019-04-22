@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FieldHolder {
-    List<Field> fieldlist;
+    private List<Field> fieldlist;
+    private Object selectObj;
 
     public List<FieldHolderObserver> getObservers() {
         return observers;
@@ -16,16 +17,18 @@ public class FieldHolder {
         observers = new ArrayList<FieldHolderObserver>();
     }
 
+    // 名前考える
     public void addFieldList(Object obj){
         try {
-            fieldlist = getFieldFromClass(obj.getClass());
+            selectObj = obj;
+            fieldlist = getFieldFromClass(selectObj.getClass());
             observers.get(0).showFieldList(fieldlist);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
     }
 
-    public List<Field> getFieldFromClass(Class clazz)
+    private List<Field> getFieldFromClass(Class clazz)
             throws NoSuchFieldException {
         List<Field> field = new ArrayList<>();
         while (clazz != null) {
@@ -41,6 +44,17 @@ public class FieldHolder {
         return field;
     }
 
+    public Object getFieldValue(int index){
+        Field field = fieldlist.get(index);
+        field.setAccessible(true);
+        try {
+            return field.get(selectObj);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
     /**
      * オブザーバーを追加する
      * @param observer
