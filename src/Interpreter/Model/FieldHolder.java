@@ -44,7 +44,7 @@ public class FieldHolder {
         return field;
     }
 
-    public Object getFieldValue(int index){
+    public Object getFieldValueFromIndex(int index){
         Field field = fieldlist.get(index);
         field.setAccessible(true);
         try {
@@ -55,6 +55,18 @@ public class FieldHolder {
         }
 
     }
+
+    public Object getFieldValue(Field field){
+        field.setAccessible(true);
+        try {
+            return field.get(selectObj);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
     /**
      * オブザーバーを追加する
      * @param observer
