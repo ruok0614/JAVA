@@ -7,11 +7,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.List;
+import Interpreter.Model.ErrorMessage;
 
 public class MainView extends JFrame implements ConstructorObserver, MethodHolderObserver, FieldHolderObserver,ObjectHolderObserver {
     private int width = 500;
@@ -28,12 +26,17 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
     private JList fieldList;
     private DefaultListModel objectModel;
     private JList objectList;
-    DefaultTableModel tableModel;
+    private DefaultTableModel tableModel;
+
+    private final String ERROR = "ERROR";
 
     public MainView(){
         init();
     }
 
+    /**
+     * メインフレームのセット
+     */
     private void init(){
         setSize(width,height);
         // ユーザーがこのフレームの「クローズ」を開始したときに、デフォルトで実行される処理を設定します。
@@ -54,6 +57,9 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
 
     }
 
+    /**
+     * クラス名入力バーと検索ボタン，コンストラクター一覧を表示するリストを追加する
+     */
     public void ConstructorList(){
         JPanel inputClassPanel = new JPanel();
         GridBagLayout inputClassGrid = new GridBagLayout ();
@@ -66,8 +72,12 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
 
         classNameGetButton.addActionListener(e -> {
             if(e.getSource() == classNameGetButton){
-                System.out.println(classNameTextArea.getText());
-                context.getConstructorHolder().searchConstructor(classNameTextArea.getText());
+                try {
+                    context.getConstructorHolder().searchConstructor(classNameTextArea.getText());
+                } catch (ClassNotFoundException e1) {
+                    JOptionPane.showMessageDialog(this, ErrorMessage.NOT_CONSTRUCTOR, ERROR,
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
@@ -84,6 +94,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         constructorList = new JList(constructorModel);
         JScrollPane constructorPane = new JScrollPane(constructorList);
         constructorList.setLayoutOrientation(JList.VERTICAL);
+        // ダブルクリックで変数を生成できるようにする
         constructorList.addMouseListener(new MouseAdapter() {
             // ダブルクリックで要素を取得
             public void mouseClicked(MouseEvent evt) {
@@ -105,10 +116,14 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
 
     }
 
+    /**
+     * インスタンス生成のため引数と変数名を表示させるウィンドウを生成する
+     * @param argsText フィールド名
+     */
     public void InstancePanel(String argsText){
         JFrame instanceJframe = new JFrame("new Instance");
         instanceJframe.setSize(250,200);
-        instanceJframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        instanceJframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
 //        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JPanel instancePanel = new JPanel();
         Container contentPane = instanceJframe.getContentPane();
@@ -120,7 +135,11 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         JButton generateButton = new JButton("生成");
         generateButton.addActionListener(e -> {
             if(e.getSource() == generateButton){
-                context.getConstructorHolder().newInstance(constructorList.getSelectedIndex(),argsTextArea.getText(),objNameArea.getText());
+                try {
+                    context.getConstructorHolder().newInstance(constructorList.getSelectedIndex(),transArgs(argsTextArea.getText()),objNameArea.getText());
+                } catch (Exception e1) {
+                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+                }
                 instanceJframe.dispose();
             }
         });
@@ -133,6 +152,9 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         instanceJframe.setVisible(true);
     }
 
+    /**
+     * メソッド一覧を表示するリスト
+     */
     public void methodList(){
         JPanel methodPanel = new JPanel();
         methodPanel.setLayout(new BoxLayout(methodPanel, BoxLayout.Y_AXIS));
@@ -180,6 +202,9 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
 //        });
 //    }
 
+    /**
+     * フィールドリストを表形式で表示する
+     */
     public void fieldList() {
         JPanel fieldPanel = new JPanel();
         fieldPanel.setLayout(new BoxLayout(fieldPanel, BoxLayout.Y_AXIS));
@@ -211,6 +236,9 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
 
     }
 
+    /**
+     * このインタプリタが保持するフィールド一覧を表示する
+     */
     public void objectList(){
         JPanel objectPanel = new JPanel();
         objectPanel.setLayout(new BoxLayout(objectPanel, BoxLayout.Y_AXIS));
@@ -315,5 +343,49 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         gbl.setConstraints(c, gbc);
         inP.add(c);
         return inP;
+    }
+
+    private Object transArgs(String args){
+        // ''で囲まている場合はcharで返す
+        if(checkType(args,'\'')){
+            if(args.length() == 3)
+                return fetch(args).charAt(0);
+            else{
+                JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,"Error",JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        // ""の場合は文字列で返す
+        if(checkType(args,'\"')){
+            return fetch(args);
+        }
+        // 数字に変換できればintできなければ文字列で返す
+        else{
+            try {
+                return Integer.parseInt(args);
+            }catch(Error e){
+                return args;
+            }
+        }
+    }
+
+    private boolean checkType(String args, char target){
+        int len = args.length() - 1;
+        if(args.charAt(0) == target){
+            if(args.charAt(len) == target){
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * 文字列の最初の文字と最後の文字を削除したものを返します．
+     * @param str 最初と最後以外を取り出したい文字列
+     * @return 最初と最後以外を取り出した文字列
+     */
+    private String fetch(String str){
+        int len = str.length();
+        return str.substring(1,len);
     }
 }

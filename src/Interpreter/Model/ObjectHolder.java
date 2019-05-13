@@ -18,20 +18,16 @@ public class ObjectHolder {
         objectList = new ArrayList<OBJ>();
     }
 
-    public void createObject(Constructor constructor, String objName, Object args){
-        try {
-            Object obj = constructor.newInstance(args);
-            addOBJ(new OBJ(objName,obj));
-            observers.get(0).showObjectList(objectList);
-
-
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+    /**
+     * オブジェクトを生成してOBJに生成したオブジェクトを追加します．
+     * @param constructor　コンストラクター
+     * @param objName　変数名
+     * @param args　引数
+     */
+    public void createObject(Constructor constructor, String objName, Object args) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Object obj = constructor.newInstance(args);
+        addOBJ(new OBJ(objName,obj));
+        observers.get(0).showObjectList(objectList);
     }
 
     public void addObserver(ObjectHolderObserver observer){

@@ -1,6 +1,7 @@
 package Interpreter.Model;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,19 +15,14 @@ public class ConstructorHolder {
         observers = new ArrayList<ConstructorObserver>();
     }
 
-    public void searchConstructor(String inputText){
+    public void searchConstructor(String inputText) throws ClassNotFoundException {
         Class<?> clazz = null;
-        try{
-            clazz = Class.forName(inputText);
-
-        }catch(ClassNotFoundException ex){
-            ex.printStackTrace();
-        }
+        clazz = Class.forName(inputText);
         constructorlist = clazz.getConstructors();
         observers.get(0).showConstructor(constructorlist);
     }
 
-    public void newInstance(int indexNum, Object args,String name){
+    public void newInstance(int indexNum, Object args,String name) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Constructor claszz = constructorlist[indexNum];
         observers.get(0).showSetFieldProperty(claszz);
         objectHolder.createObject(claszz,name, args);
