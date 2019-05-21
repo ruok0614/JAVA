@@ -50,6 +50,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         context.getFieldHolder().addObserver(this);
         context.getObjectHolder().addObserver(this);
         ConstructorList();
+        newArray();
         objectList();
         methodList();
         fieldList();
@@ -117,6 +118,40 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
     }
 
     /**
+     * クラス名入力バーと検索ボタン，コンストラクター一覧を表示するリストを追加する
+     */
+    public void newArray(){
+        JPanel newArrayPanel = new JPanel();
+        GridBagLayout inputClassGrid = new GridBagLayout ();
+        JLabel newArrayLabel = new JLabel("配列長さ");
+        newArrayPanel.setLayout(inputClassGrid);
+
+        JSpinner arraySpinner = new JSpinner();
+        JButton newArrayButton = new JButton("配列生成");
+
+        newArrayButton.addActionListener(e -> {
+            if(e.getSource() == newArrayButton){
+                try {
+                    context.getObjectHolder().
+
+                } catch (ClassNotFoundException e1) {
+                    JOptionPane.showMessageDialog(this, ErrorMessage.NOT_CONSTRUCTOR, ERROR,
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        newArrayPanel = addComponent(newArrayPanel,inputClassGrid,newArrayLabel,0,0,1,1);
+        newArrayPanel = addComponent(newArrayPanel,inputClassGrid,arraySpinner,1,0,1,1);
+        newArrayPanel = addComponent(newArrayPanel,inputClassGrid,newArrayButton,2,0,1,1);
+
+
+        mainPanel.add(newArrayPanel);
+
+    }
+
+
+    /**
      * インスタンス生成のため引数と変数名を表示させるウィンドウを生成する
      * @param argsText フィールド名
      */
@@ -167,6 +202,46 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         methodPanel.add(label);
         methodPanel.add(ObjectPanel,BorderLayout.LINE_END);
         mainPanel.add(methodPanel);
+
+        methodList.addMouseListener(new MouseAdapter() {
+            // ダブルクリックで要素を取得
+            public void mouseClicked(MouseEvent evt) {
+                JList list = (JList)evt.getSource();
+                if (evt.getClickCount() == 1) {
+                    //fieldTextArea.setText(context.getFieldHolder().getFieldValue(list.getSelectedIndex()).toString());
+                    MethodPanel(list.getSelectedValue().toString());
+                }
+            }
+        });
+    }
+
+
+    public void MethodPanel(String argsText){
+        JFrame methodJframe = new JFrame("invoke method");
+        methodJframe.setSize(250,200);
+        methodJframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JPanel methodPanel = new JPanel();
+        Container contentPane = methodJframe.getContentPane();
+        JLabel argsLabel = new JLabel("引数");
+        HintTextField argsTextArea = new HintTextField(20);
+        argsTextArea.setHint(argsText);
+        JButton generateButton = new JButton("実行");
+        generateButton.addActionListener(e -> {
+            if(e.getSource() == generateButton){
+                try {
+
+                } catch (Exception e1) {
+                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+                }
+                methodJframe.dispose();
+            }
+        });
+        methodPanel.add(argsLabel);
+        methodPanel.add(argsTextArea);
+        methodPanel.add(generateButton);
+        contentPane.add(methodPanel,BorderLayout.CENTER);
+        methodJframe.setVisible(true);
     }
 
 //    public void fieldList(){
@@ -232,9 +307,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         mainPanel.add(fieldPanel);
     }
 
-    private void showField(int selectedIndex) {
 
-    }
 
     /**
      * このインタプリタが保持するフィールド一覧を表示する
@@ -255,8 +328,8 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
             public void mouseClicked(MouseEvent evt) {
                 JList list = (JList)evt.getSource();
                 if (evt.getClickCount() == 2) {
-                    int selectedindex = list.getSelectedIndex();
-                    context.getObjectHolder().showFieldAndMethod(selectedindex);
+                    int selectedIndex = list.getSelectedIndex();
+                    context.getObjectHolder().showFieldAndMethod(selectedIndex);
                 }
             }
         });
@@ -306,6 +379,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
 //        }
 //        fieldList.ensureIndexIsVisible(fieldModel.getSize() + 1);
 //    }
+
     public void showFieldList(List<Field> fieldlist){
         tableModel.setRowCount(0);
         int r = 0;

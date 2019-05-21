@@ -1,5 +1,6 @@
 package Interpreter.Model;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -42,5 +43,9 @@ public class ObjectHolder {
         Object obj = objectList.get(index).getObj();
         methodHolder.addMethodList(obj);
         fieldHolder.addFieldList(obj);
+    }
+
+    public void addArray(String str){
+        Object arr = Array.newInstance(要素クラス.class, 配列数);
     }
 }
