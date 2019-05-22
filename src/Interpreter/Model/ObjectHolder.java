@@ -45,7 +45,11 @@ public class ObjectHolder {
         fieldHolder.addFieldList(obj);
     }
 
-    public void addArray(String str){
-        Object arr = Array.newInstance(要素クラス.class, 配列数);
+    public void addArray(String args, int arrayNum, String name) throws ClassNotFoundException {
+        Class<?> clazz = null;
+        clazz = Class.forName(args);
+        Object arr = Array.newInstance(clazz, arrayNum);
+        addOBJ(new OBJ(name,arr));
+        observers.get(0).showObjectList(objectList);
     }
 }

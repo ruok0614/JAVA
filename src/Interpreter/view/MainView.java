@@ -27,6 +27,8 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
     private DefaultListModel objectModel;
     private JList objectList;
     private DefaultTableModel tableModel;
+    private JList arrayList;
+    private DefaultTableModel arrayModel;
 
     private final String ERROR = "ERROR";
 
@@ -50,7 +52,6 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         context.getFieldHolder().addObserver(this);
         context.getObjectHolder().addObserver(this);
         ConstructorList();
-        newArray();
         objectList();
         methodList();
         fieldList();
@@ -68,6 +69,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
 
         classNameTextArea = new JTextField(20);
         classNameGetButton = new JButton("取得");
+        JButton newArrayButton = new JButton("配列生成");
 
         classNameTextArea.setText("java.lang.String");
 
@@ -84,6 +86,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
 
         inputClassPanel = addComponent(inputClassPanel,inputClassGrid,classNameTextArea,0,0,1,1);
         inputClassPanel = addComponent(inputClassPanel,inputClassGrid,classNameGetButton,1,0,1,1);
+        inputClassPanel = addComponent(inputClassPanel,inputClassGrid,newArrayButton,2,0,1,1);
 
 
         Container contentPane = getContentPane();
@@ -111,43 +114,66 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
                 }
             }
         });
+        newArrayButton.addActionListener(e -> {
+            if(e.getSource() == newArrayButton){
+                newArrayPanel(classNameTextArea.getText());
+            }
+        });
+
+
         constructorPanel.add(inputClassPanel);
         constructorPanel.add(constructorPane,BorderLayout.CENTER);
         mainPanel.add(constructorPanel);
 
     }
 
-    /**
-     * クラス名入力バーと検索ボタン，コンストラクター一覧を表示するリストを追加する
-     */
-    public void newArray(){
-        JPanel newArrayPanel = new JPanel();
-        GridBagLayout inputClassGrid = new GridBagLayout ();
-        JLabel newArrayLabel = new JLabel("配列長さ");
-        newArrayPanel.setLayout(inputClassGrid);
 
+    public void newArrayPanel(String className){
+        JFrame instanceJframe = new JFrame("new Instance");
+        instanceJframe.setSize(250,200);
+        instanceJframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JPanel instancePanel = new JPanel();
+        Container contentPane = instanceJframe.getContentPane();
+        JLabel argsLabel = new JLabel("配列長さ     ");
         JSpinner arraySpinner = new JSpinner();
-        JButton newArrayButton = new JButton("配列生成");
-
-        newArrayButton.addActionListener(e -> {
-            if(e.getSource() == newArrayButton){
-                try {
-                    context.getObjectHolder().
-
-                } catch (ClassNotFoundException e1) {
-                    JOptionPane.showMessageDialog(this, ErrorMessage.NOT_CONSTRUCTOR, ERROR,
-                            JOptionPane.ERROR_MESSAGE);
+        arraySpinner.setValue(1);
+        JLabel nameLabel = new JLabel("名前");
+        JTextField objNameArea = new JTextField(20);
+        JButton generateButton = new JButton("生成");
+        generateButton.addActionListener(e -> {
+            if(e.getSource() == generateButton){
+                if((int)arraySpinner.getValue() < 1){
+                    JOptionPane.showMessageDialog(this,ErrorMessage.ARRAY_LENGTH_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
                 }
+                if(objNameArea.getText() == null || objNameArea.getText().length() == 0){
+                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+                }
+                try {
+                    context.getObjectHolder().addArray(className,(int)arraySpinner.getValue(),objNameArea.getText());
+                } catch (Exception e1) {
+                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+                }
+                instanceJframe.dispose();
             }
         });
 
-        newArrayPanel = addComponent(newArrayPanel,inputClassGrid,newArrayLabel,0,0,1,1);
-        newArrayPanel = addComponent(newArrayPanel,inputClassGrid,arraySpinner,1,0,1,1);
-        newArrayPanel = addComponent(newArrayPanel,inputClassGrid,newArrayButton,2,0,1,1);
+        JPanel numConfigPanel = new JPanel();
+        GridBagLayout inputClassGrid = new GridBagLayout ();
+        numConfigPanel.setLayout(inputClassGrid);
+        numConfigPanel = addComponent(numConfigPanel,inputClassGrid,argsLabel,0,0,1,1);
+        numConfigPanel = addComponent(numConfigPanel,inputClassGrid,arraySpinner,2,0,1,1);
 
+        JPanel namePanel = new JPanel();
+        namePanel.setLayout(inputClassGrid);
+        namePanel = addComponent(namePanel,inputClassGrid,nameLabel,0,0,1,1);
+        namePanel = addComponent(namePanel,inputClassGrid,objNameArea,1,0,1,1);
 
-        mainPanel.add(newArrayPanel);
-
+        instancePanel.add(numConfigPanel);
+        instancePanel.add(namePanel);
+        instancePanel.add(generateButton);
+        contentPane.add(instancePanel,BorderLayout.CENTER);
+        instanceJframe.setVisible(true);
     }
 
 
@@ -244,39 +270,6 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         methodJframe.setVisible(true);
     }
 
-//    public void fieldList(){
-//        JPanel fieldPanel = new JPanel();
-//        fieldPanel.setLayout(new BoxLayout(fieldPanel, BoxLayout.Y_AXIS));
-//        fieldModel = new DefaultListModel();
-//        fieldList = new JList(fieldModel);
-//        JScrollPane fieldPane = new JScrollPane(fieldList);
-//        fieldList.setLayoutOrientation(JList.VERTICAL);
-//        JLabel label = new JLabel("フィールド一覧");
-//        fieldPanel.add(label);
-//        fieldPanel.add(fieldPane,BorderLayout.LINE_END);
-//        mainPanel.add(fieldPanel);
-//
-//        JPanel changeFieldPanel = new JPanel();
-//        GridBagLayout changeFieldGrid = new GridBagLayout ();
-//        changeFieldPanel.setLayout(changeFieldGrid);
-//
-//        JTextField fieldTextArea = new JTextField(20);
-//        JButton fieldChangeButton = new JButton("変更");
-//        changeFieldPanel = addComponent(changeFieldPanel,changeFieldGrid,fieldTextArea,0,0,1,1);
-//        changeFieldPanel = addComponent(changeFieldPanel,changeFieldGrid,fieldChangeButton,1,0,1,1);
-//        mainPanel.add(changeFieldPanel);
-//
-//        fieldList.addMouseListener(new MouseAdapter() {
-//            // ダブルクリックで要素を取得
-//            public void mouseClicked(MouseEvent evt) {
-//                JList list = (JList)evt.getSource();
-//                if (evt.getClickCount() == 1) {
-//                    fieldTextArea.setText(context.getFieldHolder().getFieldValue(list.getSelectedIndex()).toString());
-//                }
-//            }
-//        });
-//    }
-
     /**
      * フィールドリストを表形式で表示する
      */
@@ -336,6 +329,34 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
 
     }
 
+    /**
+     * このインタプリタが保持するフィールド一覧を表示する
+     */
+    public void ArrayList(){
+        JPanel objectPanel = new JPanel();
+        objectPanel.setLayout(new BoxLayout(objectPanel, BoxLayout.Y_AXIS));
+        arrayModel = new DefaultListModel();
+        arrayList = new JList(arrayModel);
+        JScrollPane objectPane = new JScrollPane(arrayList);
+        arrayList.setLayoutOrientation(JList.VERTICAL);
+        JLabel label = new JLabel("配列");
+        objectPanel.add(label);
+        objectPanel.add(objectPane,BorderLayout.LINE_END);
+        mainPanel.add(objectPanel);
+        arrayList.addMouseListener(new MouseAdapter() {
+            // ダブルクリックで要素を取得
+            public void mouseClicked(MouseEvent evt) {
+                JList list = (JList)evt.getSource();
+                if (evt.getClickCount() == 2) {
+                    int selectedIndex = list.getSelectedIndex();
+                    context.getObjectHolder().showFieldAndMethod(selectedIndex);
+                }
+            }
+        });
+
+    }
+
+
     @Override
     public void showConstructor(Constructor[] constructorArray){
         constructorModel.removeAllElements();
@@ -368,18 +389,6 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         methodList.ensureIndexIsVisible(methodModel.getSize() + 1);
     }
 
-//    public void showFieldList(List<Field> fieldlist){
-//        fieldModel.removeAllElements();
-//        for (Field f:fieldlist){
-//            if(f.getDeclaringClass() == Object.class)
-//                continue;
-//            String decl = f.toString();
-//            System.out.println(decl);
-//            fieldModel.addElement(decl);
-//        }
-//        fieldList.ensureIndexIsVisible(fieldModel.getSize() + 1);
-//    }
-
     public void showFieldList(List<Field> fieldlist){
         tableModel.setRowCount(0);
         int r = 0;
@@ -397,13 +406,22 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         }
         fieldList.ensureIndexIsVisible(fieldModel.getSize() + 1);
     }
+
     public void showObjectList(List<OBJ> obj){
         objectModel.removeAllElements();
         for (OBJ o:obj){
             String decl = o.getName();
             System.out.println(decl);
             objectModel.addElement(decl);
+        }
+    }
 
+    public void showObjectArrayList(List<OBJ> obj){
+        objectModel.removeAllElements();
+        for (OBJ o:obj){
+            String decl = o.getName();
+            System.out.println(decl);
+            objectModel.addElement(decl);
         }
     }
 
