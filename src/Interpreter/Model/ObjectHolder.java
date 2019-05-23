@@ -40,7 +40,7 @@ public class ObjectHolder {
     }
 
     public void showFieldAndMethod(int index){
-        Object obj = objectList.get(index).getObj();
+        Object obj = objectList.get(index).getValue();
         methodHolder.addMethodList(obj);
         fieldHolder.addFieldList(obj);
     }

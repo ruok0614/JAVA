@@ -2,18 +2,22 @@ package Interpreter.Model;
 
 public class OBJ {
     private String name;
-    private Object obj;
+    private Object value;
 
-    public OBJ(String name, Object obj){
+    public OBJ(String name, Object value){
         this.name = name;
-        this.obj = obj;
+        this.value = value;
+    }
+
+    public Class<?> getValueType(){
+        return value.getClass();
     }
 
     public String getName() {
         return name;
     }
 
-    public Object getObj() {
-        return obj;
+    public Object getValue() {
+        return value;
     }
 }

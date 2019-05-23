@@ -146,9 +146,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
                 if((int)arraySpinner.getValue() < 1){
                     JOptionPane.showMessageDialog(this,ErrorMessage.ARRAY_LENGTH_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
                 }
-                if(objNameArea.getText() == null || objNameArea.getText().length() == 0){
-                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
-                }
+
                 try {
                     context.getObjectHolder().addArray(className,(int)arraySpinner.getValue(),objNameArea.getText());
                 } catch (Exception e1) {
@@ -332,29 +330,29 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
     /**
      * このインタプリタが保持するフィールド一覧を表示する
      */
-    public void ArrayList(){
-        JPanel objectPanel = new JPanel();
-        objectPanel.setLayout(new BoxLayout(objectPanel, BoxLayout.Y_AXIS));
-        arrayModel = new DefaultListModel();
-        arrayList = new JList(arrayModel);
-        JScrollPane objectPane = new JScrollPane(arrayList);
-        arrayList.setLayoutOrientation(JList.VERTICAL);
-        JLabel label = new JLabel("配列");
-        objectPanel.add(label);
-        objectPanel.add(objectPane,BorderLayout.LINE_END);
-        mainPanel.add(objectPanel);
-        arrayList.addMouseListener(new MouseAdapter() {
-            // ダブルクリックで要素を取得
-            public void mouseClicked(MouseEvent evt) {
-                JList list = (JList)evt.getSource();
-                if (evt.getClickCount() == 2) {
-                    int selectedIndex = list.getSelectedIndex();
-                    context.getObjectHolder().showFieldAndMethod(selectedIndex);
-                }
-            }
-        });
-
-    }
+//    public void ArrayList(){
+//        JPanel objectPanel = new JPanel();
+//        objectPanel.setLayout(new BoxLayout(objectPanel, BoxLayout.Y_AXIS));
+//        arrayModel = new DefaultListModel();
+//        arrayList = new JList(arrayModel);
+//        JScrollPane objectPane = new JScrollPane(arrayList);
+//        arrayList.setLayoutOrientation(JList.VERTICAL);
+//        JLabel label = new JLabel("配列");
+//        objectPanel.add(label);
+//        objectPanel.add(objectPane,BorderLayout.LINE_END);
+//        mainPanel.add(objectPanel);
+//        arrayList.addMouseListener(new MouseAdapter() {
+//            // ダブルクリックで要素を取得
+//            public void mouseClicked(MouseEvent evt) {
+//                JList list = (JList)evt.getSource();
+//                if (evt.getClickCount() == 2) {
+//                    int selectedIndex = list.getSelectedIndex();
+//                    context.getObjectHolder().showFieldAndMethod(selectedIndex);
+//                }
+//            }
+//        });
+//
+//    }
 
 
     @Override
@@ -437,6 +435,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         return inP;
     }
 
+    //Todo 複数引数に対応
     private Object transArgs(String args){
         // ''で囲まている場合はcharで返す
         if(checkType(args,'\'')){

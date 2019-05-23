@@ -25,6 +25,8 @@ public class MethodHolder {
 
     }
 
+
+
     /**
      * オブザーバーを追加する
      * @param observer
