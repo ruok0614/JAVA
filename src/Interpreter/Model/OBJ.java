@@ -1,4 +1,4 @@
-package Interpreter.Model;
+package Interpreter.model;
 
 public class OBJ {
     private String name;

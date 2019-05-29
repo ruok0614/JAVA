@@ -1,4 +1,4 @@
-package Interpreter.Model;
+package Interpreter.model;
 
 public class ErrorMessage {
     public static final String NOT_CONSTRUCTOR = "クラス名が正しくありません";

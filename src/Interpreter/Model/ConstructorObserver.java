@@ -1,7 +1,6 @@
-package Interpreter.Model;
+package Interpreter.model;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Member;
 
 public interface ConstructorObserver {
     void showConstructor(Constructor[] constructorlist);

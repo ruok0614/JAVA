@@ -1,4 +1,4 @@
-package Interpreter.Model;
+package Interpreter.model;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

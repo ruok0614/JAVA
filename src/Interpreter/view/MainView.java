@@ -1,6 +1,7 @@
 package Interpreter.view;
 
-import Interpreter.Model.*;
+import Interpreter.commonLibrary.StringExpoter;
+import Interpreter.model.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -9,9 +10,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.*;
 import java.util.List;
-import Interpreter.Model.ErrorMessage;
+import Interpreter.model.ErrorMessage;
 
-public class MainView extends JFrame implements ConstructorObserver, MethodHolderObserver, FieldHolderObserver,ObjectHolderObserver {
+public class MainView extends JFrame implements ArrayHolderObserver,ConstructorObserver, MethodHolderObserver, FieldHolderObserver,ObjectHolderObserver {
     private int width = 500;
     private int height =650;
     private JPanel mainPanel;
@@ -26,10 +27,13 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
     private JList fieldList;
     private DefaultListModel objectModel;
     private JList objectList;
+    private JPanel objectPanel;
     private DefaultTableModel tableModel;
     private JList arrayList;
-    private DefaultTableModel arrayModel;
-
+    private DefaultListModel arrayModel;
+    private JPanel consolePanel;
+    private JTextArea textArea;
+    private int activeObjectIndex;
     private final String ERROR = "ERROR";
 
     public MainView(){
@@ -51,10 +55,15 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         context.getMethodHolder().addObserver(this);
         context.getFieldHolder().addObserver(this);
         context.getObjectHolder().addObserver(this);
+        context.getArrayHolder().addObserver(this);
+
         ConstructorList();
         objectList();
+        arrayList();
         methodList();
+        outPutConsole();
         fieldList();
+
 
 
     }
@@ -195,7 +204,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         generateButton.addActionListener(e -> {
             if(e.getSource() == generateButton){
                 try {
-                    context.getConstructorHolder().newInstance(constructorList.getSelectedIndex(),transArgs(argsTextArea.getText()),objNameArea.getText());
+                    context.getConstructorHolder().newInstance(constructorList.getSelectedIndex(), StringExpoter.toClassType(argsTextArea.getText()),objNameArea.getText());
                 } catch (Exception e1) {
                     JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
                 }
@@ -231,16 +240,16 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
             // ダブルクリックで要素を取得
             public void mouseClicked(MouseEvent evt) {
                 JList list = (JList)evt.getSource();
-                if (evt.getClickCount() == 1) {
+                if (evt.getClickCount() == 2) {
                     //fieldTextArea.setText(context.getFieldHolder().getFieldValue(list.getSelectedIndex()).toString());
-                    MethodPanel(list.getSelectedValue().toString());
+                    MethodPanel(list.getSelectedIndex(), list.getSelectedValue().toString());
                 }
             }
         });
     }
 
 
-    public void MethodPanel(String argsText){
+    public void MethodPanel(int selectIndex ,String argsText){
         JFrame methodJframe = new JFrame("invoke method");
         methodJframe.setSize(250,200);
         methodJframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
@@ -254,7 +263,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         generateButton.addActionListener(e -> {
             if(e.getSource() == generateButton){
                 try {
-
+                    context.getObjectHolder().invoke(selectIndex,activeObjectIndex,StringExpoter.toClassType(argsTextArea.getText()));
                 } catch (Exception e1) {
                     JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
                 }
@@ -304,7 +313,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
      * このインタプリタが保持するフィールド一覧を表示する
      */
     public void objectList(){
-        JPanel objectPanel = new JPanel();
+        objectPanel = new JPanel();
         objectPanel.setLayout(new BoxLayout(objectPanel, BoxLayout.Y_AXIS));
         objectModel = new DefaultListModel();
         objectList = new JList(objectModel);
@@ -319,8 +328,10 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
             public void mouseClicked(MouseEvent evt) {
                 JList list = (JList)evt.getSource();
                 if (evt.getClickCount() == 2) {
-                    int selectedIndex = list.getSelectedIndex();
-                    context.getObjectHolder().showFieldAndMethod(selectedIndex);
+                    activeObjectIndex = list.getSelectedIndex();
+                    if (!context.getObjectHolder().tryShowArray(activeObjectIndex)) {
+                        context.getObjectHolder().showFieldAndMethod(activeObjectIndex);
+                    }
                 }
             }
         });
@@ -330,30 +341,53 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
     /**
      * このインタプリタが保持するフィールド一覧を表示する
      */
-//    public void ArrayList(){
-//        JPanel objectPanel = new JPanel();
-//        objectPanel.setLayout(new BoxLayout(objectPanel, BoxLayout.Y_AXIS));
-//        arrayModel = new DefaultListModel();
-//        arrayList = new JList(arrayModel);
-//        JScrollPane objectPane = new JScrollPane(arrayList);
-//        arrayList.setLayoutOrientation(JList.VERTICAL);
-//        JLabel label = new JLabel("配列");
-//        objectPanel.add(label);
-//        objectPanel.add(objectPane,BorderLayout.LINE_END);
-//        mainPanel.add(objectPanel);
-//        arrayList.addMouseListener(new MouseAdapter() {
-//            // ダブルクリックで要素を取得
-//            public void mouseClicked(MouseEvent evt) {
-//                JList list = (JList)evt.getSource();
-//                if (evt.getClickCount() == 2) {
-//                    int selectedIndex = list.getSelectedIndex();
-//                    context.getObjectHolder().showFieldAndMethod(selectedIndex);
-//                }
-//            }
-//        });
-//
-//    }
+    public void arrayList(){
+        JPanel  arrayPanel = new JPanel();
+        arrayPanel.setLayout(new BoxLayout(arrayPanel, BoxLayout.Y_AXIS));
+        arrayModel = new DefaultListModel();
+        arrayList = new JList(arrayModel);
+        JScrollPane objectPane = new JScrollPane(arrayList);
+        arrayList.setLayoutOrientation(JList.VERTICAL);
+        JLabel label = new JLabel("配列要素一覧");
+        arrayPanel.add(label);
+        arrayPanel.add(objectPane,BorderLayout.LINE_END);
 
+        JPanel ObjAndArrayPanel = new JPanel();
+        GridBagLayout inputClassGrid = new GridBagLayout ();
+        ObjAndArrayPanel.setLayout(inputClassGrid);
+        ObjAndArrayPanel = addComponent(ObjAndArrayPanel,inputClassGrid,objectPanel,0,0,1,1);
+        ObjAndArrayPanel = addComponent(ObjAndArrayPanel,inputClassGrid,arrayPanel,1,0,1,1);
+
+        mainPanel.add(ObjAndArrayPanel);
+        arrayList.addMouseListener(new MouseAdapter() {
+            // ダブルクリックで要素を取得
+            public void mouseClicked(MouseEvent evt) {
+                JList list = (JList)evt.getSource();
+                if (evt.getClickCount() == 2) {
+                    int selectedIndex = list.getSelectedIndex();
+                    context.getObjectHolder().showFieldAndMethod(selectedIndex);
+                }
+            }
+        });
+
+    }
+
+
+    public void outPutConsole(){
+        consolePanel = new JPanel();
+        JLabel consoleLabel = new JLabel("出力");
+        consolePanel.setLayout(new BoxLayout(consolePanel, BoxLayout.Y_AXIS));
+        textArea = new JTextArea(3,15);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+
+        GridBagLayout inputClassGrid = new GridBagLayout ();
+        consolePanel.setLayout(inputClassGrid);
+        consolePanel = addComponent(consolePanel,inputClassGrid,consoleLabel,0,0,1,1);
+        consolePanel = addComponent(consolePanel,inputClassGrid,textArea,0,1,1,1);
+
+        mainPanel.add(consolePanel);
+    }
 
     @Override
     public void showConstructor(Constructor[] constructorArray){
@@ -374,6 +408,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
 
     }
 
+    @Override
     public void showMethodList(List<Method> methodlist){
         methodModel.removeAllElements();
         for (Method m:methodlist){
@@ -387,6 +422,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         methodList.ensureIndexIsVisible(methodModel.getSize() + 1);
     }
 
+    @Override
     public void showFieldList(List<Field> fieldlist){
         tableModel.setRowCount(0);
         int r = 0;
@@ -405,6 +441,7 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         fieldList.ensureIndexIsVisible(fieldModel.getSize() + 1);
     }
 
+    @Override
     public void showObjectList(List<OBJ> obj){
         objectModel.removeAllElements();
         for (OBJ o:obj){
@@ -414,14 +451,25 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         }
     }
 
-    public void showObjectArrayList(List<OBJ> obj){
-        objectModel.removeAllElements();
-        for (OBJ o:obj){
-            String decl = o.getName();
+    @Override
+    public void showInvokeResult(Object returnValue) {
+       textArea.setText(returnValue.toString());
+    }
+
+    public void showArray(List<Object> obj){
+        arrayModel.removeAllElements();
+        for (Object o:obj){
+            String decl;
+            try {
+                decl = o.getClass().toString();
+            }catch (NullPointerException e){
+                decl = "null";
+            }
             System.out.println(decl);
-            objectModel.addElement(decl);
+            arrayModel.addElement(decl);
         }
     }
+
 
     private JPanel addComponent(JPanel inP,GridBagLayout gbl, Component c, int x, int y, int w, int h) {
         GridBagConstraints gbc = new GridBagConstraints();
@@ -435,48 +483,6 @@ public class MainView extends JFrame implements ConstructorObserver, MethodHolde
         return inP;
     }
 
-    //Todo 複数引数に対応
-    private Object transArgs(String args){
-        // ''で囲まている場合はcharで返す
-        if(checkType(args,'\'')){
-            if(args.length() == 3)
-                return fetch(args).charAt(0);
-            else{
-                JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,"Error",JOptionPane.ERROR_MESSAGE);
-            }
-        }
-        // ""の場合は文字列で返す
-        if(checkType(args,'\"')){
-            return fetch(args);
-        }
-        // 数字に変換できればintできなければ文字列で返す
-        else{
-            try {
-                return Integer.parseInt(args);
-            }catch(Error e){
-                return args;
-            }
-        }
-    }
 
-    private boolean checkType(String args, char target){
-        int len = args.length() - 1;
-        if(args.charAt(0) == target){
-            if(args.charAt(len) == target){
-                return true;
-            }
-            return false;
-        }
-        return false;
-    }
 
-    /**
-     * 文字列の最初の文字と最後の文字を削除したものを返します．
-     * @param str 最初と最後以外を取り出したい文字列
-     * @return 最初と最後以外を取り出した文字列
-     */
-    private String fetch(String str){
-        int len = str.length();
-        return str.substring(1,len);
-    }
 }

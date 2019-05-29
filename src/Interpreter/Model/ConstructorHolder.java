@@ -1,4 +1,4 @@
-package Interpreter.Model;
+package Interpreter.model;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
