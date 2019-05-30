@@ -1,6 +1,4 @@
-package Interpreter.model;
-
-import org.codehaus.groovy.runtime.powerassert.Value;
+package Interpreter.model.common;
 
 public class Result {
     private enum State{

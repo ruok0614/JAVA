@@ -1,5 +1,7 @@
 package Interpreter.model;
 
+import Interpreter.model.common.Result;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -27,14 +29,8 @@ public class ObjectHolder {
      * @param objName　変数名
      * @param args　引数
      */
-    public void createObject(Constructor constructor, String objName, Object args) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        Object newInstance;
-        if(args == null){
-            newInstance = constructor.newInstance();
-        }else{
-            newInstance = constructor.newInstance(args);
-        }
-
+    public void createObject(Constructor constructor, String objName, Object[] args) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Object newInstance = constructor.newInstance(args);
         addOBJ(new OBJ(objName,newInstance));
         observers.get(0).showObjectList(objectList);
     }
@@ -71,7 +67,7 @@ public class ObjectHolder {
         observers.get(0).showObjectList(objectList);
     }
 
-    public void invoke(int methodIndex,int objIndex,Object args) throws InvocationTargetException, IllegalAccessException {
+    public void invoke(int methodIndex,int objIndex,Object[] args) throws InvocationTargetException, IllegalAccessException {
         Object srcObj = objectList.get(objIndex).getValue();
         Result result = methodHolder.invoke(methodIndex,args,srcObj);
         observers.get(0).showInvokeResult(result.toString());

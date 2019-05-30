@@ -1,6 +1,6 @@
 package Interpreter.view;
 
-import Interpreter.commonLibrary.StringExpoter;
+import Interpreter.model.common.StringExpoter;
 import Interpreter.model.*;
 
 import javax.swing.*;

@@ -1,5 +1,7 @@
 package Interpreter.model;
 
+import Interpreter.model.common.Result;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -25,15 +27,12 @@ public class MethodHolder {
         }
 
     }
-    public Result invoke(int index, Object args,Object src) throws  IllegalAccessException {
+    public Result invoke(int index, Object[] args, Object src) throws  IllegalAccessException {
         Method method = methodlist.get(index);
         Object returnValue;
         try {
-            if (args == null) {
-                returnValue = method.invoke(src);
-            } else {
                 returnValue = method.invoke(src, args);
-            }
+
             return Result.createSuccess(returnValue);
         }
         catch (InvocationTargetException e) {
