@@ -6,6 +6,8 @@ import Interpreter.model.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.*;
@@ -33,8 +35,10 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
     private DefaultListModel arrayModel;
     private JPanel consolePanel;
     private JTextArea textArea;
-    private int activeObjectIndex;
+
     private final String ERROR = "ERROR";
+
+    private int activeObjectIndex;
 
     public MainView(){
         init();
@@ -302,9 +306,24 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
         JTable table = new JTable(tableModel);
         javax.swing.JScrollPane fieldPane = new JScrollPane(table);
 
-
         fieldPanel.add(fieldPane);
         mainPanel.add(fieldPanel);
+
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                int fieldIndex = table.getSelectedRow();
+                String value = table.getValueAt(table.getSelectedRow(),1).toString();
+                try {
+                    context.getObjectHolder().setField(activeObjectIndex,fieldIndex,value);
+                } catch (IllegalAccessException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        };
+        table.getActionMap().put("MY_CUSTOM_ACTION", action);
+        table.getInputMap().put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false),
+                "MY_CUSTOM_ACTION");
     }
 
 
@@ -366,11 +385,42 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
                 if (evt.getClickCount() == 2) {
                     int selectedIndex = list.getSelectedIndex();
                     context.getObjectHolder().showFieldAndMethod(selectedIndex);
+                }else if(evt.getClickCount() == 3){
+                    MethodPanel(list.getSelectedIndex(), list.getSelectedValue().toString());
                 }
             }
         });
 
     }
+
+//    public void ArrayChangeFieldPanel(int selectIndex){
+//        JFrame arrayFieldFrame = new JFrame("Change Array Field");
+//        arrayFieldFrame.setSize(250,200);
+//        arrayFieldFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
+//        JPanel arrayFieldPanel = new JPanel();
+//        Container contentPane = arrayFieldFrame.getContentPane();
+//        JLabel argsLabel = new JLabel("値");
+//        HintTextField FieldArea = new HintTextField(20);
+//        FieldArea.setHint(argsText);
+//        JButton generateButton = new JButton("実行");
+//        generateButton.addActionListener(e -> {
+//            if(e.getSource() == generateButton){
+//                try {
+//                    context.getObjectHolder().invoke(selectIndex,activeObjectIndex,StringExpoter.toClassType(argsTextArea.getText()));
+//                } catch (Exception e1) {
+//                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+//                }
+//                arrayFieldFrame.dispose();
+//            }
+//        });
+//        arrayFieldPanel.add(argsLabel);
+//        arrayFieldPanel.add(argsTextArea);
+//        arrayFieldPanel.add(generateButton);
+//        contentPane.add(arrayFieldPanel,BorderLayout.CENTER);
+//        arrayFieldFrame.setVisible(true);
+//    }
+
+
 
 
     public void outPutConsole(){
@@ -438,7 +488,7 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
             tableModel.addRow(s);
             r++;
         }
-        fieldList.ensureIndexIsVisible(fieldModel.getSize() + 1);
+        fieldList.ensureIndexIsVisible(fieldModel.getSize());
     }
 
     @Override

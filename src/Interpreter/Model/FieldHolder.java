@@ -1,5 +1,7 @@
 package Interpreter.model;
 
+import Interpreter.model.common.StringExpoter;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +55,6 @@ public class FieldHolder {
             e.printStackTrace();
             return null;
         }
-
     }
 
     public Object getFieldValue(Field field){
@@ -65,6 +66,14 @@ public class FieldHolder {
             return null;
         }
 
+    }
+
+    public void setField(int index, Object value, Object target) throws IllegalAccessException {
+
+        Field f = fieldlist.get(index);
+        f.setAccessible(true);
+        f.set(target, StringExpoter.toClassType(value.toString()));
+        observers.get(0).showFieldList(fieldlist);
     }
 
     /**

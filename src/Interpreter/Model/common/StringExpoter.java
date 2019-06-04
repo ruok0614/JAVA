@@ -37,7 +37,7 @@ public class StringExpoter {
                     objArgs.add(Boolean.FALSE);
                 }
                 try {
-                    objArgs.add(Integer.parseInt(s));
+                    objArgs.add(Integer.valueOf(s));
                 } catch (NumberFormatException e) {
                     throw new IllegalArgumentException();
                 }

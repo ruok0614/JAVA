@@ -10,11 +10,11 @@ import java.util.List;
 
 
 public class ObjectHolder {
-    FieldHolder fieldHolder;
-    MethodHolder methodHolder;
-    ArrayHolder arrayHolder;
-    List<ObjectHolderObserver> observers;
-    List<OBJ> objectList;
+    private FieldHolder fieldHolder;
+    private MethodHolder methodHolder;
+    private ArrayHolder arrayHolder;
+    private List<ObjectHolderObserver> observers;
+    private List<OBJ> objectList;
     ObjectHolder(FieldHolder fieldHolder, MethodHolder methodHolder,ArrayHolder arrayHolder){
         this.fieldHolder = fieldHolder;
         this.methodHolder = methodHolder;
@@ -72,4 +72,9 @@ public class ObjectHolder {
         Result result = methodHolder.invoke(methodIndex,args,srcObj);
         observers.get(0).showInvokeResult(result.toString());
     }
+    public void setField(int objIndex,int fieldIndex, Object value) throws IllegalAccessException {
+        Object target = objectList.get(objIndex).getValue();
+        fieldHolder.setField(fieldIndex,value,target);
+    }
+
 }
