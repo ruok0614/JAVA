@@ -50,9 +50,9 @@ public class ObjectHolder {
     }
 
     public boolean tryShowArray(int index){
-        Object obj = objectList.get(index).getValue();
-        if(obj.getClass().isArray()){
-             arrayHolder.addArrayList(obj);
+        OBJ obj = objectList.get(index);
+        if(obj.getValue().getClass().isArray()){
+             arrayHolder.addArrayList(obj.getValue(),obj.getName());
              return true;
         }else {
              return false;
@@ -72,9 +72,20 @@ public class ObjectHolder {
         Result result = methodHolder.invoke(methodIndex,args,srcObj);
         observers.get(0).showInvokeResult(result.toString());
     }
-    public void setField(int objIndex,int fieldIndex, Object value) throws IllegalAccessException {
+    public Result setField(int objIndex,int fieldIndex, Object value) throws IllegalAccessException {
         Object target = objectList.get(objIndex).getValue();
-        fieldHolder.setField(fieldIndex,value,target);
+        Result result = fieldHolder.setField(fieldIndex,value,target);
+        return result;
+    }
+
+    public Object searachObj(String args){
+        for(OBJ o:objectList){
+            String name = o.getName();
+            if(args.equals(name)){
+                return o.getValue();
+            }
+        }
+        return null;
     }
 
 }

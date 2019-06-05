@@ -3,8 +3,8 @@ package Interpreter.model.common;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StringExpoter {
-    public static Object[] toClassType(String args){
+public class StringExporter {
+    public static Object[] toClassTypes(String args){
 
         // ""の場合はnullを返す
         if(args.length() == 0){
@@ -24,26 +24,71 @@ public class StringExpoter {
                 else {
                     throw new IllegalArgumentException();
                 }
+                continue;
             }
             // ""の場合は文字列で返す
             if (checkEnclose(s, '\"')) {
                 objArgs.add(fetch(s));
+                continue;
             }
+            if (s.equals("true")) {
+                objArgs.add(Boolean.TRUE);
+                continue;
+            }
+            if (s.equals("false")) {
+                objArgs.add(Boolean.FALSE);
+                continue;
+            }
+
+
             // 数字に変換できればintできなければ文字列で返す
-            else {
-                if (s.equals("true")) {
-                    objArgs.add(Boolean.TRUE);
-                } else if (s.equals("false")) {
-                    objArgs.add(Boolean.FALSE);
-                }
-                try {
-                    objArgs.add(Integer.valueOf(s));
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException();
-                }
+            try {
+                objArgs.add(Integer.valueOf(s));
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException();
             }
+
         }
         return objArgs.toArray();
+    }
+
+    public static Object toClassType(String args){
+
+        // ""の場合はnullを返す
+        if(args.length() == 0){
+            return new Object[0] ;
+        }
+        if(args.equals("null")){
+            return null;
+        }
+
+
+        // ''で囲まている場合はcharで返す
+        if (checkEnclose(args, '\'')) {
+            if (args.length() == 3)
+                return fetch(args).charAt(0);
+            else {
+                throw new IllegalArgumentException();
+            }
+        }
+        // ""の場合は文字列で返す
+        if (checkEnclose(args, '\"')) {
+            return fetch(args);
+        }
+        if (args.equals("true")) {
+            return Boolean.TRUE;
+        }
+        if (args.equals("false")) {
+            return Boolean.FALSE;
+        }
+
+
+        // 数字に変換できればintできなければ文字列で返す
+        try {
+            return Integer.valueOf(args);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException();
+        }
     }
 
     private static boolean checkEnclose(String args, char target){

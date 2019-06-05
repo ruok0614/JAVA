@@ -1,6 +1,6 @@
 package Interpreter.model;
 
-import Interpreter.model.common.StringExpoter;
+import Interpreter.model.common.Result;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -68,12 +68,18 @@ public class FieldHolder {
 
     }
 
-    public void setField(int index, Object value, Object target) throws IllegalAccessException {
+    public Result setField(int index, Object value, Object target) throws IllegalAccessException {
 
         Field f = fieldlist.get(index);
         f.setAccessible(true);
-        f.set(target, StringExpoter.toClassType(value.toString()));
+        try {
+            f.set(target, value);
+        }catch (IllegalArgumentException e){
+            observers.get(0).showFieldList(fieldlist);
+            return Result.createFailure(e);
+        }
         observers.get(0).showFieldList(fieldlist);
+        return Result.createSuccess(value);
     }
 
     /**

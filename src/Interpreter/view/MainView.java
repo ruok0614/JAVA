@@ -1,6 +1,7 @@
 package Interpreter.view;
 
-import Interpreter.model.common.StringExpoter;
+import Interpreter.model.common.Result;
+import Interpreter.model.common.StringExporter;
 import Interpreter.model.*;
 
 import javax.swing.*;
@@ -11,7 +12,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+
 import Interpreter.model.ErrorMessage;
 
 public class MainView extends JFrame implements ArrayHolderObserver,ConstructorObserver, MethodHolderObserver, FieldHolderObserver,ObjectHolderObserver {
@@ -208,7 +212,7 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
         generateButton.addActionListener(e -> {
             if(e.getSource() == generateButton){
                 try {
-                    context.getConstructorHolder().newInstance(constructorList.getSelectedIndex(), StringExpoter.toClassType(argsTextArea.getText()),objNameArea.getText());
+                    context.getConstructorHolder().newInstance(constructorList.getSelectedIndex(), searchAndTransTypes(argsTextArea.getText()),objNameArea.getText());
                 } catch (Exception e1) {
                     JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
                 }
@@ -267,7 +271,7 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
         generateButton.addActionListener(e -> {
             if(e.getSource() == generateButton){
                 try {
-                    context.getObjectHolder().invoke(selectIndex,activeObjectIndex,StringExpoter.toClassType(argsTextArea.getText()));
+                    context.getObjectHolder().invoke(selectIndex,activeObjectIndex, searchAndTransTypes(argsTextArea.getText()));
                 } catch (Exception e1) {
                     JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
                 }
@@ -314,7 +318,8 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
                 int fieldIndex = table.getSelectedRow();
                 String value = table.getValueAt(table.getSelectedRow(),1).toString();
                 try {
-                    context.getObjectHolder().setField(activeObjectIndex,fieldIndex,value);
+                    Result result = context.getObjectHolder().setField(activeObjectIndex,fieldIndex, searchAndTransType(value));
+                    showInvokeResult(result);
                 } catch (IllegalAccessException e1) {
                     e1.printStackTrace();
                 }
@@ -384,7 +389,7 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
                 JList list = (JList)evt.getSource();
                 if (evt.getClickCount() == 2) {
                     int selectedIndex = list.getSelectedIndex();
-                    context.getObjectHolder().showFieldAndMethod(selectedIndex);
+                    ArrayChangeFieldPanel(selectedIndex);
                 }else if(evt.getClickCount() == 3){
                     MethodPanel(list.getSelectedIndex(), list.getSelectedValue().toString());
                 }
@@ -393,32 +398,32 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
 
     }
 
-//    public void ArrayChangeFieldPanel(int selectIndex){
-//        JFrame arrayFieldFrame = new JFrame("Change Array Field");
-//        arrayFieldFrame.setSize(250,200);
-//        arrayFieldFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
-//        JPanel arrayFieldPanel = new JPanel();
-//        Container contentPane = arrayFieldFrame.getContentPane();
-//        JLabel argsLabel = new JLabel("値");
-//        HintTextField FieldArea = new HintTextField(20);
-//        FieldArea.setHint(argsText);
-//        JButton generateButton = new JButton("実行");
-//        generateButton.addActionListener(e -> {
-//            if(e.getSource() == generateButton){
-//                try {
-//                    context.getObjectHolder().invoke(selectIndex,activeObjectIndex,StringExpoter.toClassType(argsTextArea.getText()));
-//                } catch (Exception e1) {
-//                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
-//                }
-//                arrayFieldFrame.dispose();
-//            }
-//        });
-//        arrayFieldPanel.add(argsLabel);
-//        arrayFieldPanel.add(argsTextArea);
-//        arrayFieldPanel.add(generateButton);
-//        contentPane.add(arrayFieldPanel,BorderLayout.CENTER);
-//        arrayFieldFrame.setVisible(true);
-//    }
+    public void ArrayChangeFieldPanel(int selectIndex){
+        JFrame arrayFieldFrame = new JFrame("Change Array Field");
+        arrayFieldFrame.setSize(250,200);
+        arrayFieldFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
+        JPanel arrayFieldPanel = new JPanel();
+        Container contentPane = arrayFieldFrame.getContentPane();
+        JLabel argsLabel = new JLabel("値");
+        HintTextField fieldArea = new HintTextField(20);
+        JButton generateButton = new JButton("変更");
+        generateButton.addActionListener(e -> {
+            if(e.getSource() == generateButton){
+                try {
+                    Result result = context.getArrayHolder().setValue(selectIndex,StringExporter.toClassType(fieldArea.getText()));
+                    showInvokeResult(result);
+                } catch (Exception e1) {
+                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+                }
+                arrayFieldFrame.dispose();
+            }
+        });
+        arrayFieldPanel.add(argsLabel);
+        arrayFieldPanel.add(fieldArea);
+        arrayFieldPanel.add(generateButton);
+        contentPane.add(arrayFieldPanel,BorderLayout.CENTER);
+        arrayFieldFrame.setVisible(true);
+    }
 
 
 
@@ -488,7 +493,7 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
             tableModel.addRow(s);
             r++;
         }
-        fieldList.ensureIndexIsVisible(fieldModel.getSize());
+        //fieldList.ensureIndexIsVisible(fieldlist.size());
     }
 
     @Override
@@ -511,11 +516,10 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
         for (Object o:obj){
             String decl;
             try {
-                decl = o.getClass().toString();
+                decl = o.toString();
             }catch (NullPointerException e){
                 decl = "null";
             }
-            System.out.println(decl);
             arrayModel.addElement(decl);
         }
     }
@@ -533,6 +537,61 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
         return inP;
     }
 
+    private Object[] searchAndTransTypes(String args){
+        // ""の場合はnullを返す
+        if(args.length() == 0){
+            return new Object[0] ;
+        }
+        if(args.equals("null")){
+            return null;
+        }
+        String pattern = "^.+\\[[1-9]+\\]$";
+
+        String[] splitArgs = args.split(",");
+        List<Object> objArgs = new ArrayList<>();
+        for(String s : splitArgs) {
+            Pattern p = Pattern.compile(pattern);
+            if(p.matcher(s).find()){
+                String str[] = s.split("\\[|\\]",0);
+                String name = str[0];
+                int index = Integer.parseInt(str[1]);
+                objArgs.add(context.getArrayHolder().searchArrayValue(index,name));
+
+            }
+            Object obj = context.getObjectHolder().searachObj(s);
+            if(obj == null){
+                objArgs.add(StringExporter.toClassType(s));
+                continue;
+            }
+            objArgs.add(obj);
+        }
+        return objArgs.toArray();
+    }
+
+    private Object searchAndTransType(String args){
+        // ""の場合はnullを返す
+        if(args.length() == 0){
+            return new Object[0] ;
+        }
+        if(args.equals("null")){
+            return null;
+        }
+        String pattern = "^.+\\[[1-9]+\\]$";
+
+        Pattern p = Pattern.compile(pattern);
+        if(p.matcher(args).find()){
+            String str[] = args.split("\\[|\\]",0);
+            String name = str[0];
+            int index = Integer.parseInt(str[1]);
+            return context.getArrayHolder().searchArrayValue(index,name);
+
+        }
+        Object obj = context.getObjectHolder().searachObj(args);
+        if(obj == null){
+            return (StringExporter.toClassType(args));
+        }
+        return obj;
+    }
 
 
 }
