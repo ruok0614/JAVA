@@ -27,6 +27,8 @@ public class FieldHolder {
             observers.get(0).showFieldList(fieldlist);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
+        }catch (NullPointerException e){
+            observers.get(0).showFieldList(null);
         }
     }
 

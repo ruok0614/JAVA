@@ -19,8 +19,8 @@ import java.util.regex.Pattern;
 import Interpreter.model.ErrorMessage;
 
 public class MainView extends JFrame implements ArrayHolderObserver,ConstructorObserver, MethodHolderObserver, FieldHolderObserver,ObjectHolderObserver {
-    private int width = 500;
-    private int height =650;
+    private int width = 900;
+    private int height =800;
     private JPanel mainPanel;
     private JTextField classNameTextArea;
     private Context context;
@@ -144,88 +144,72 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
 
     }
 
-
-    public void newArrayPanel(String className){
-        JFrame instanceJframe = new JFrame("new Instance");
-        instanceJframe.setSize(250,200);
-        instanceJframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        JPanel instancePanel = new JPanel();
-        Container contentPane = instanceJframe.getContentPane();
-        JLabel argsLabel = new JLabel("配列長さ     ");
-        JSpinner arraySpinner = new JSpinner();
-        arraySpinner.setValue(1);
-        JLabel nameLabel = new JLabel("名前");
-        JTextField objNameArea = new JTextField(20);
-        JButton generateButton = new JButton("生成");
-        generateButton.addActionListener(e -> {
-            if(e.getSource() == generateButton){
-                if((int)arraySpinner.getValue() < 1){
-                    JOptionPane.showMessageDialog(this,ErrorMessage.ARRAY_LENGTH_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+    /**
+     * このインタプリタが保持するフィールド一覧を表示する
+     */
+    public void objectList(){
+        objectPanel = new JPanel();
+        objectPanel.setLayout(new BoxLayout(objectPanel, BoxLayout.Y_AXIS));
+        objectModel = new DefaultListModel();
+        objectList = new JList(objectModel);
+        JScrollPane objectPane = new JScrollPane(objectList);
+        objectList.setLayoutOrientation(JList.VERTICAL);
+        JLabel label = new JLabel("オブジェクト一覧");
+        objectPanel.add(label);
+        objectPanel.add(objectPane,BorderLayout.LINE_END);
+        mainPanel.add(objectPanel);
+        objectList.addMouseListener(new MouseAdapter() {
+            // ダブルクリックで要素を取得
+            public void mouseClicked(MouseEvent evt) {
+                JList list = (JList)evt.getSource();
+                if (evt.getClickCount() == 2) {
+                    activeObjectIndex = list.getSelectedIndex();
+                    if (!context.getObjectHolder().tryShowArray(activeObjectIndex)) {
+                        arrayModel.removeAllElements();
+                        context.getObjectHolder().showFieldAndMethod(activeObjectIndex);
+                    }
                 }
-
-                try {
-                    context.getObjectHolder().addArray(className,(int)arraySpinner.getValue(),objNameArea.getText());
-                } catch (Exception e1) {
-                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
-                }
-                instanceJframe.dispose();
             }
         });
 
-        JPanel numConfigPanel = new JPanel();
-        GridBagLayout inputClassGrid = new GridBagLayout ();
-        numConfigPanel.setLayout(inputClassGrid);
-        numConfigPanel = addComponent(numConfigPanel,inputClassGrid,argsLabel,0,0,1,1);
-        numConfigPanel = addComponent(numConfigPanel,inputClassGrid,arraySpinner,2,0,1,1);
-
-        JPanel namePanel = new JPanel();
-        namePanel.setLayout(inputClassGrid);
-        namePanel = addComponent(namePanel,inputClassGrid,nameLabel,0,0,1,1);
-        namePanel = addComponent(namePanel,inputClassGrid,objNameArea,1,0,1,1);
-
-        instancePanel.add(numConfigPanel);
-        instancePanel.add(namePanel);
-        instancePanel.add(generateButton);
-        contentPane.add(instancePanel,BorderLayout.CENTER);
-        instanceJframe.setVisible(true);
     }
 
-
     /**
-     * インスタンス生成のため引数と変数名を表示させるウィンドウを生成する
-     * @param argsText フィールド名
+     * このインタプリタが保持するフィールド一覧を表示する
      */
-    public void InstancePanel(String argsText){
-        JFrame instanceJframe = new JFrame("new Instance");
-        instanceJframe.setSize(250,200);
-        instanceJframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        JPanel instancePanel = new JPanel();
-        Container contentPane = instanceJframe.getContentPane();
-        JLabel argsLabel = new JLabel("引数");
-        HintTextField argsTextArea = new HintTextField(20);
-        argsTextArea.setHint(argsText);
-        JLabel nameLabel = new JLabel("名前");
-        JTextField objNameArea = new JTextField(20);
-        JButton generateButton = new JButton("生成");
-        generateButton.addActionListener(e -> {
-            if(e.getSource() == generateButton){
-                try {
-                    context.getConstructorHolder().newInstance(constructorList.getSelectedIndex(), searchAndTransTypes(argsTextArea.getText()),objNameArea.getText());
-                } catch (Exception e1) {
-                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+    public void arrayList(){
+        JPanel  arrayPanel = new JPanel();
+        arrayPanel.setLayout(new BoxLayout(arrayPanel, BoxLayout.Y_AXIS));
+        arrayModel = new DefaultListModel();
+        arrayList = new JList(arrayModel);
+        JScrollPane objectPane = new JScrollPane(arrayList);
+        arrayList.setLayoutOrientation(JList.VERTICAL);
+        JLabel label = new JLabel("配列要素一覧");
+        arrayPanel.add(label);
+        arrayPanel.add(objectPane,BorderLayout.LINE_END);
+
+        JPanel ObjAndArrayPanel = new JPanel();
+        GridBagLayout inputClassGrid = new GridBagLayout ();
+        ObjAndArrayPanel.setLayout(inputClassGrid);
+        ObjAndArrayPanel = addComponent(ObjAndArrayPanel,inputClassGrid,objectPanel,0,0,1,1);
+        ObjAndArrayPanel = addComponent(ObjAndArrayPanel,inputClassGrid,arrayPanel,1,0,1,1);
+
+        mainPanel.add(ObjAndArrayPanel);
+        arrayList.addMouseListener(new MouseAdapter() {
+            // ダブルクリックで要素を取得
+            public void mouseClicked(MouseEvent evt) {
+                JList list = (JList)evt.getSource();
+                if (evt.getClickCount() == 1) {
+                    int selectedIndex = list.getSelectedIndex();
+                        context.getObjectHolder().showArrayFieldAndMethod(activeObjectIndex,selectedIndex);
                 }
-                instanceJframe.dispose();
+                if (evt.getClickCount() == 2) {
+                    int selectedIndex = list.getSelectedIndex();
+                    ArrayChangeFieldPanel(selectedIndex);
+                }
             }
         });
-        instancePanel.add(argsLabel);
-        instancePanel.add(argsTextArea);
-        instancePanel.add(nameLabel);
-        instancePanel.add(objNameArea);
-        instancePanel.add(generateButton);
-        contentPane.add(instancePanel,BorderLayout.CENTER);
-        instanceJframe.setVisible(true);
+
     }
 
     /**
@@ -254,35 +238,6 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
                 }
             }
         });
-    }
-
-
-    public void MethodPanel(int selectIndex ,String argsText){
-        JFrame methodJframe = new JFrame("invoke method");
-        methodJframe.setSize(250,200);
-        methodJframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        JPanel methodPanel = new JPanel();
-        Container contentPane = methodJframe.getContentPane();
-        JLabel argsLabel = new JLabel("引数");
-        HintTextField argsTextArea = new HintTextField(20);
-        argsTextArea.setHint(argsText);
-        JButton generateButton = new JButton("実行");
-        generateButton.addActionListener(e -> {
-            if(e.getSource() == generateButton){
-                try {
-                    context.getObjectHolder().invoke(selectIndex,activeObjectIndex, searchAndTransTypes(argsTextArea.getText()));
-                } catch (Exception e1) {
-                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
-                }
-                methodJframe.dispose();
-            }
-        });
-        methodPanel.add(argsLabel);
-        methodPanel.add(argsTextArea);
-        methodPanel.add(generateButton);
-        contentPane.add(methodPanel,BorderLayout.CENTER);
-        methodJframe.setVisible(true);
     }
 
     /**
@@ -331,103 +286,9 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
                 "MY_CUSTOM_ACTION");
     }
 
-
-
     /**
-     * このインタプリタが保持するフィールド一覧を表示する
+     * コンソール表示
      */
-    public void objectList(){
-        objectPanel = new JPanel();
-        objectPanel.setLayout(new BoxLayout(objectPanel, BoxLayout.Y_AXIS));
-        objectModel = new DefaultListModel();
-        objectList = new JList(objectModel);
-        JScrollPane objectPane = new JScrollPane(objectList);
-        objectList.setLayoutOrientation(JList.VERTICAL);
-        JLabel label = new JLabel("オブジェクト一覧");
-        objectPanel.add(label);
-        objectPanel.add(objectPane,BorderLayout.LINE_END);
-        mainPanel.add(objectPanel);
-        objectList.addMouseListener(new MouseAdapter() {
-            // ダブルクリックで要素を取得
-            public void mouseClicked(MouseEvent evt) {
-                JList list = (JList)evt.getSource();
-                if (evt.getClickCount() == 2) {
-                    activeObjectIndex = list.getSelectedIndex();
-                    if (!context.getObjectHolder().tryShowArray(activeObjectIndex)) {
-                        context.getObjectHolder().showFieldAndMethod(activeObjectIndex);
-                    }
-                }
-            }
-        });
-
-    }
-
-    /**
-     * このインタプリタが保持するフィールド一覧を表示する
-     */
-    public void arrayList(){
-        JPanel  arrayPanel = new JPanel();
-        arrayPanel.setLayout(new BoxLayout(arrayPanel, BoxLayout.Y_AXIS));
-        arrayModel = new DefaultListModel();
-        arrayList = new JList(arrayModel);
-        JScrollPane objectPane = new JScrollPane(arrayList);
-        arrayList.setLayoutOrientation(JList.VERTICAL);
-        JLabel label = new JLabel("配列要素一覧");
-        arrayPanel.add(label);
-        arrayPanel.add(objectPane,BorderLayout.LINE_END);
-
-        JPanel ObjAndArrayPanel = new JPanel();
-        GridBagLayout inputClassGrid = new GridBagLayout ();
-        ObjAndArrayPanel.setLayout(inputClassGrid);
-        ObjAndArrayPanel = addComponent(ObjAndArrayPanel,inputClassGrid,objectPanel,0,0,1,1);
-        ObjAndArrayPanel = addComponent(ObjAndArrayPanel,inputClassGrid,arrayPanel,1,0,1,1);
-
-        mainPanel.add(ObjAndArrayPanel);
-        arrayList.addMouseListener(new MouseAdapter() {
-            // ダブルクリックで要素を取得
-            public void mouseClicked(MouseEvent evt) {
-                JList list = (JList)evt.getSource();
-                if (evt.getClickCount() == 2) {
-                    int selectedIndex = list.getSelectedIndex();
-                    ArrayChangeFieldPanel(selectedIndex);
-                }else if(evt.getClickCount() == 3){
-                    MethodPanel(list.getSelectedIndex(), list.getSelectedValue().toString());
-                }
-            }
-        });
-
-    }
-
-    public void ArrayChangeFieldPanel(int selectIndex){
-        JFrame arrayFieldFrame = new JFrame("Change Array Field");
-        arrayFieldFrame.setSize(250,200);
-        arrayFieldFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
-        JPanel arrayFieldPanel = new JPanel();
-        Container contentPane = arrayFieldFrame.getContentPane();
-        JLabel argsLabel = new JLabel("値");
-        HintTextField fieldArea = new HintTextField(20);
-        JButton generateButton = new JButton("変更");
-        generateButton.addActionListener(e -> {
-            if(e.getSource() == generateButton){
-                try {
-                    Result result = context.getArrayHolder().setValue(selectIndex,StringExporter.toClassType(fieldArea.getText()));
-                    showInvokeResult(result);
-                } catch (Exception e1) {
-                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
-                }
-                arrayFieldFrame.dispose();
-            }
-        });
-        arrayFieldPanel.add(argsLabel);
-        arrayFieldPanel.add(fieldArea);
-        arrayFieldPanel.add(generateButton);
-        contentPane.add(arrayFieldPanel,BorderLayout.CENTER);
-        arrayFieldFrame.setVisible(true);
-    }
-
-
-
-
     public void outPutConsole(){
         consolePanel = new JPanel();
         JLabel consoleLabel = new JLabel("出力");
@@ -443,6 +304,145 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
 
         mainPanel.add(consolePanel);
     }
+
+
+    /**
+     * インスタンス生成のため引数と変数名を表示させるウィンドウを生成する
+     * @param argsText フィールド名
+     */
+    public void InstancePanel(String argsText){
+        JFrame instanceJframe = new JFrame("new Instance");
+        instanceJframe.setSize(250,200);
+        instanceJframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JPanel instancePanel = new JPanel();
+        Container contentPane = instanceJframe.getContentPane();
+        JLabel argsLabel = new JLabel("引数");
+        HintTextField argsTextArea = new HintTextField(20);
+        argsTextArea.setHint(argsText);
+        JLabel nameLabel = new JLabel("名前");
+        JTextField objNameArea = new JTextField(20);
+        JButton generateButton = new JButton("生成");
+        generateButton.addActionListener(e -> {
+            if(e.getSource() == generateButton){
+                try {
+                    context.getConstructorHolder().newInstance(constructorList.getSelectedIndex(), searchAndTransTypes(argsTextArea.getText()),objNameArea.getText());
+                } catch (Exception e1) {
+                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+                }
+                instanceJframe.dispose();
+            }
+        });
+        instancePanel.add(argsLabel);
+        instancePanel.add(argsTextArea);
+        instancePanel.add(nameLabel);
+        instancePanel.add(objNameArea);
+        instancePanel.add(generateButton);
+        contentPane.add(instancePanel,BorderLayout.CENTER);
+        instanceJframe.setVisible(true);
+    }
+
+    public void newArrayPanel(String className){
+        JFrame instanceJframe = new JFrame("new Instance");
+        instanceJframe.setSize(250,200);
+        instanceJframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JPanel instancePanel = new JPanel();
+        Container contentPane = instanceJframe.getContentPane();
+        JLabel argsLabel = new JLabel("配列長さ     ");
+        JSpinner arraySpinner = new JSpinner();
+        arraySpinner.setValue(1);
+        JLabel nameLabel = new JLabel("名前");
+        JTextField objNameArea = new JTextField(20);
+        JButton generateButton = new JButton("生成");
+        generateButton.addActionListener(e -> {
+            if(e.getSource() == generateButton){
+                if((int)arraySpinner.getValue() < 1){
+                    JOptionPane.showMessageDialog(this,ErrorMessage.ARRAY_LENGTH_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+                }
+
+                try {
+                    context.getObjectHolder().addArray(className,(int)arraySpinner.getValue(),objNameArea.getText());
+                } catch (Exception e1) {
+                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+                }
+                instanceJframe.dispose();
+            }
+        });
+
+        JPanel numConfigPanel = new JPanel();
+        GridBagLayout inputClassGrid = new GridBagLayout ();
+        numConfigPanel.setLayout(inputClassGrid);
+        numConfigPanel = addComponent(numConfigPanel,inputClassGrid,argsLabel,0,0,1,1);
+        numConfigPanel = addComponent(numConfigPanel,inputClassGrid,arraySpinner,2,0,1,1);
+
+        JPanel namePanel = new JPanel();
+        namePanel.setLayout(inputClassGrid);
+        namePanel = addComponent(namePanel,inputClassGrid,nameLabel,0,0,1,1);
+        namePanel = addComponent(namePanel,inputClassGrid,objNameArea,1,0,1,1);
+
+        instancePanel.add(numConfigPanel);
+        instancePanel.add(namePanel);
+        instancePanel.add(generateButton);
+        contentPane.add(instancePanel,BorderLayout.CENTER);
+        instanceJframe.setVisible(true);
+    }
+
+    public void ArrayChangeFieldPanel(int selectIndex){
+        JFrame arrayFieldFrame = new JFrame("Change Array Field");
+        arrayFieldFrame.setSize(250,200);
+        arrayFieldFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
+        JPanel arrayFieldPanel = new JPanel();
+        Container contentPane = arrayFieldFrame.getContentPane();
+        JLabel argsLabel = new JLabel("値");
+        HintTextField fieldArea = new HintTextField(20);
+        JButton generateButton = new JButton("変更");
+        generateButton.addActionListener(e -> {
+            if(e.getSource() == generateButton){
+                try {
+                    Result result = context.getObjectHolder().setArrayValue(selectIndex,activeObjectIndex,StringExporter.toClassType(fieldArea.getText()));
+                    showInvokeResult(result);
+                } catch (Exception e1) {
+                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+                }
+                arrayFieldFrame.dispose();
+            }
+        });
+        arrayFieldPanel.add(argsLabel);
+        arrayFieldPanel.add(fieldArea);
+        arrayFieldPanel.add(generateButton);
+        contentPane.add(arrayFieldPanel,BorderLayout.CENTER);
+        arrayFieldFrame.setVisible(true);
+    }
+
+    public void MethodPanel(int selectIndex ,String argsText){
+        JFrame methodJframe = new JFrame("invoke method");
+        methodJframe.setSize(250,200);
+        methodJframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE );
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JPanel methodPanel = new JPanel();
+        Container contentPane = methodJframe.getContentPane();
+        JLabel argsLabel = new JLabel("引数");
+        HintTextField argsTextArea = new HintTextField(20);
+        argsTextArea.setHint(argsText);
+        JButton generateButton = new JButton("実行");
+        generateButton.addActionListener(e -> {
+            if(e.getSource() == generateButton){
+                try {
+                    context.getObjectHolder().invoke(selectIndex,activeObjectIndex, searchAndTransTypes(argsTextArea.getText()));
+                } catch (Exception e1) {
+                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+                }
+                methodJframe.dispose();
+            }
+        });
+        methodPanel.add(argsLabel);
+        methodPanel.add(argsTextArea);
+        methodPanel.add(generateButton);
+        contentPane.add(methodPanel,BorderLayout.CENTER);
+        methodJframe.setVisible(true);
+    }
+
 
     @Override
     public void showConstructor(Constructor[] constructorArray){
@@ -466,12 +466,14 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
     @Override
     public void showMethodList(List<Method> methodlist){
         methodModel.removeAllElements();
+        if(methodlist == null){
+            return;
+        }
         for (Method m:methodlist){
             if(m.getDeclaringClass() == Object.class)
                 continue;
-            String decl = m.toString();
-            System.out.println(decl);
-            methodModel.addElement(decl);
+            String methodName = m.toGenericString();
+            methodModel.addElement(methodName);
 
         }
         methodList.ensureIndexIsVisible(methodModel.getSize() + 1);
@@ -480,14 +482,17 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
     @Override
     public void showFieldList(List<Field> fieldlist){
         tableModel.setRowCount(0);
+        if(fieldlist == null){
+            return;
+        }
+
         int r = 0;
         for (Field f:fieldlist){
             String s[] = new String[2];
             if(f.getDeclaringClass() == Object.class)
                 continue;
-            String decl = f.toString();
-            System.out.println(decl);
-            s[0] = decl;
+            String fieldName = f.toString();
+            s[0] = fieldName;
             s[1] = context.getFieldHolder().getFieldValue(f).toString();
 
             tableModel.addRow(s);
@@ -500,9 +505,9 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
     public void showObjectList(List<OBJ> obj){
         objectModel.removeAllElements();
         for (OBJ o:obj){
-            String decl = o.getName();
-            System.out.println(decl);
-            objectModel.addElement(decl);
+            String name  = o.getName();
+            String className = o.getValue().getClass().getSimpleName();
+            objectModel.addElement(String.format("%s  %s", className,name));
         }
     }
 
@@ -510,8 +515,8 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
     public void showInvokeResult(Object returnValue) {
        textArea.setText(returnValue.toString());
     }
-
-    public void showArray(List<Object> obj){
+    @Override
+    public void showArray(Object[] obj){
         arrayModel.removeAllElements();
         for (Object o:obj){
             String decl;
@@ -523,7 +528,6 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
             arrayModel.addElement(decl);
         }
     }
-
 
     private JPanel addComponent(JPanel inP,GridBagLayout gbl, Component c, int x, int y, int w, int h) {
         GridBagConstraints gbc = new GridBagConstraints();
@@ -558,7 +562,7 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
                 objArgs.add(context.getArrayHolder().searchArrayValue(index,name));
 
             }
-            Object obj = context.getObjectHolder().searachObj(s);
+            Object obj = context.getObjectHolder().searchObj(s);
             if(obj == null){
                 objArgs.add(StringExporter.toClassType(s));
                 continue;
@@ -586,7 +590,7 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
             return context.getArrayHolder().searchArrayValue(index,name);
 
         }
-        Object obj = context.getObjectHolder().searachObj(args);
+        Object obj = context.getObjectHolder().searchObj(args);
         if(obj == null){
             return (StringExporter.toClassType(args));
         }

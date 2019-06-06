@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArrayHolder {
-    private List<Object> array;
+    private Object[] array;
     private List<ArrayHolderObserver> observers;
     private String name;
     public List<ArrayHolderObserver> getObservers() {
@@ -26,9 +26,10 @@ public class ArrayHolder {
         this.name = name;
         Class<?> type =  obj.getClass().getComponentType();
         int length = Array.getLength(obj);
-        array = new ArrayList<>();
+
+        array = newArray(type,length);
         for(int i = 0; i < length; i++){
-            array.add(Array.get(obj, i));
+            array[i] = Array.get(obj,i);
         }
         observers.get(0).showArray(array);
 
@@ -43,20 +44,20 @@ public class ArrayHolder {
     }
 
     public Object searchArrayValue(int index, String name){
-        if(!this.name.equals(name) || array.size() <= index){
+        if(!this.name.equals(name) || array.length <= index){
             throw new IllegalArgumentException();
         }
-        return array.get(index);
+        return array[index];
     }
 
     public Result setValue(int index,Object value){
-        if(index > array.size()){
+        if(index > array.length){
             return Result.createFailure(new ArrayIndexOutOfBoundsException());
         }
         if(value == null){
             return Result.createFailure(new IllegalArgumentException());
         }
-        array.set(index,value);
+        array[index] = value;
         observers.get(0).showArray(array);
         return Result.createSuccess(value);
     }

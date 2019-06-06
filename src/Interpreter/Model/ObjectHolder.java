@@ -48,6 +48,11 @@ public class ObjectHolder {
         methodHolder.addMethodList(obj);
         fieldHolder.addFieldList(obj);
     }
+    public void showArrayFieldAndMethod(int objIndex,int arrIndex){
+        Object obj = Array.get(objectList.get(objIndex).getValue(),arrIndex);
+        methodHolder.addMethodList(obj);
+        fieldHolder.addFieldList(obj);
+    }
 
     public boolean tryShowArray(int index){
         OBJ obj = objectList.get(index);
@@ -78,7 +83,7 @@ public class ObjectHolder {
         return result;
     }
 
-    public Object searachObj(String args){
+    public Object searchObj(String args){
         for(OBJ o:objectList){
             String name = o.getName();
             if(args.equals(name)){
@@ -86,6 +91,13 @@ public class ObjectHolder {
             }
         }
         return null;
+    }
+
+    public Result setArrayValue(int arrayIndex,int objIndex,Object value){
+
+        Array.set(objectList.get(objIndex).getValue(),arrayIndex,value);
+        Result res = arrayHolder.setValue(arrayIndex,value);
+        return res;
     }
 
 }

@@ -20,11 +20,13 @@ public class MethodHolder {
         observers = new ArrayList<MethodHolderObserver>();
     }
     public void addMethodList(Object obj){
-        methodlist = Arrays.asList(obj.getClass().getMethods());
-        observers.get(0).showMethodList(methodlist);
-        for (Method m:methodlist) {
-            System.out.println(m);
+        try {
+            methodlist = Arrays.asList(obj.getClass().getMethods());
+        }catch (Exception e){
+            observers.get(0).showMethodList(null);
+            return;
         }
+        observers.get(0).showMethodList(methodlist);
 
     }
     public Result invoke(int index, Object[] args, Object src) throws  IllegalAccessException {

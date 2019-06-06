@@ -43,7 +43,7 @@ public class StringExporter {
 
             // 数字に変換できればintできなければ文字列で返す
             try {
-                objArgs.add(Integer.valueOf(s));
+                objArgs.add(Integer.parseInt(s));
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException();
             }
@@ -60,6 +60,13 @@ public class StringExporter {
         }
         if(args.equals("null")){
             return null;
+        }
+        if(args.charAt(0) == '@'){
+            int byteNum = Integer.parseInt(args.substring(1));
+            if(byteNum < 256){
+                return (byte)byteNum;
+            }
+            throw new IllegalArgumentException();
         }
 
 
@@ -85,7 +92,7 @@ public class StringExporter {
 
         // 数字に変換できればintできなければ文字列で返す
         try {
-            return Integer.valueOf(args);
+            return Integer.parseInt(args);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException();
         }
