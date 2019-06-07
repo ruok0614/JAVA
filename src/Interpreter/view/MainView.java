@@ -327,8 +327,20 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
             if(e.getSource() == generateButton){
                 try {
                     context.getConstructorHolder().newInstance(constructorList.getSelectedIndex(), searchAndTransTypes(argsTextArea.getText()),objNameArea.getText());
-                } catch (Exception e1) {
+                } catch (IllegalArgumentException e1) {
+                    JOptionPane.showMessageDialog(this,ErrorMessage.IllegalArgumentException,ERROR,JOptionPane.ERROR_MESSAGE);
+                }catch (InstantiationException e2){
                     JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+
+                }catch (InvocationTargetException e3){
+                    JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
+
+                }catch (ExceptionInInitializerError e4){
+                    JOptionPane.showMessageDialog(this,ErrorMessage.ExceptionInInitializerError,ERROR,JOptionPane.ERROR_MESSAGE);
+
+                }catch (IllegalAccessException e5){
+                    JOptionPane.showMessageDialog(this,ErrorMessage.IllegalArgumentException,ERROR,JOptionPane.ERROR_MESSAGE);
+
                 }
                 instanceJframe.dispose();
             }
@@ -363,7 +375,10 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
 
                 try {
                     context.getObjectHolder().addArray(className,(int)arraySpinner.getValue(),objNameArea.getText());
-                } catch (Exception e1) {
+                } catch (ClassNotFoundException e1){
+                    JOptionPane.showMessageDialog(this,ErrorMessage.ClassNotFoundException,ERROR,JOptionPane.ERROR_MESSAGE);
+                }
+                catch (Exception ee) {
                     JOptionPane.showMessageDialog(this,ErrorMessage.ARGMENT_ILLEGAL,ERROR,JOptionPane.ERROR_MESSAGE);
                 }
                 instanceJframe.dispose();
