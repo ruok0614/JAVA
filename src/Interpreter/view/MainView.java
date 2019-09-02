@@ -23,7 +23,7 @@ public class MainView extends JFrame implements ArrayHolderObserver,ConstructorO
     private int height =800;
     private JPanel mainPanel;
     private JTextField classNameTextArea;
-    private Context context;
+    private Interpreter.model.Context context;
     private JButton classNameGetButton;
     private DefaultListModel constructorModel;
     private JList constructorList;
